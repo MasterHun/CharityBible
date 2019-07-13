@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="0px"
+        android:layout_marginTop="0px"
+        android:orientation="vertical"
+        android:padding="0px">
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="0px"
+            android:layout_marginTop="0px"
+            android:background="@color/colorPrimaryDark"
+            android:padding="0px">
+
+            <Button
+                android:id="@+id/overflow"
+                android:layout_width="40dp"
+                android:layout_height="fill_parent"
+                android:textColor="@android:color/holo_blue_dark"
+                android:layout_alignParentLeft="true"
+                android:text="←"
+                android:textSize="22sp"/>
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_marginBottom="-6px"
+                android:layout_marginTop="0px"
+                android:layout_gravity="center_horizontal"
+                android:layout_centerInParent="true"
+                android:padding="0px">
+
+                <TextView
+                    android:id="@+id/simple_testament"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:paddingTop="5dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="간략보기"
+                    android:textColor="@android:color/holo_red_light"
+                    android:background="@android:color/white"
+                    android:textSize="27sp"
+                    />
+
+                <TextView
+                    android:id="@+id/list_testament"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:paddingTop="5dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="목록보기"
+                    android:textColor="@android:color/holo_red_light"
+                    android:background="@android:color/white"
+                    android:textSize="27sp"/>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <ViewFlipper
+            android:id="@+id/flipper"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="0px"
+            android:layout_marginTop="0px"
+            android:layout_weight="1.0" >
+
+            <ListView
+                android:id="@+id/list"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:choiceMode="multipleChoice"
+                android:drawSelectorOnTop="false"
+                android:fadingEdge="none"/>
+
+            <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical">
+                <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/table"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                </TableLayout>
+            </ScrollView>
+        </ViewFlipper>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

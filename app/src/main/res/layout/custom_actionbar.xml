@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_gravity="center_vertical"
+    android:background="@color/colorPrimaryDark"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
+    <Button
+        android:id="@+id/btn1_top"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentLeft="true"
+        android:text="Btn1"/>
+    <Button
+        android:id="@+id/btn2_top"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@+id/btn1_top"
+        android:text="Btn2"/>
+    <Button
+        android:id="@+id/btn3_top"
+        android:layout_width="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_height="50dp"
+        android:layout_toRightOf="@+id/btn2_top"
+        android:text="Btn3"/>
+
+    <ImageButton
+        android:id="@+id/imgbtn_more_menu_top"
+        android:layout_centerInParent="true"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/ic_more_menu_black_24dp"
+        />
+
+    <ImageButton
+        android:id="@+id/imgbtn_mp3_top"
+        android:layout_centerInParent="true"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_toLeftOf="@id/imgbtn_more_menu_top"
+        android:background="@drawable/ic_volume_black_24dp"
+        />
+
+
+
+
+</RelativeLayout>

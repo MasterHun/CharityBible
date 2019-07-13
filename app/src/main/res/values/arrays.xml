@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="dbnames">
+        <item>BIBLE_KORHKJV</item>
+        <item>BIBLE_KORNKRV</item>
+        <item>BIBLE_KOR</item>
+        <item>BIBLE_KORHKJV</item>
+
+    </string-array>
+
+
+    <string-array name="versions">
+
+        <!-- 공백이 있으면 절대 안된다. -->
+
+        <item>바른성경(KTV)</item>
+        <item>개역개정(NKRV)</item>
+        <item>KJV흠정역(HKJV)</item>
+        <item>개역한글(HRV)</item>
+        <item>개역개정(NKRV*)</item>
+        <item>새번역(NRSV)</item>
+        <item>공동번역개정판(NKCBCh)</item>
+        <item>쉬운성경(Easy)</item>
+        <item>우리말성경(DOB)</item>
+        <item>현대인의성경(KLB)</item>
+        <item>개역한글국한문(HRVCh)</item>
+        <item>개역한글국한문-병행(HCHV)</item>
+        <item>개역개정국한문(NKRVCh)</item>
+        <item>바른성경국한문(KTVCh)</item>
+        <item>가톨릭성경(Cath)</item>
+        <item>현대어성경(TKV)</item>
+
+        <item>NIV</item>
+        <item>KJV</item>
+        <item>NASB</item>
+        <item>NLT</item>
+        <item>ESV</item>
+        <item>GNT</item>
+        <item>HCSB</item>
+        <item>MSG</item>
+        <item>ISV</item>
+        <item>NKJV</item>
+        <item>NRSV</item>
+        <item>TNIV</item>
+        <item>Darby</item>
+        <item>YLT</item>
+        <item>ASV</item>
+        <item>Weymouth(NT)</item>
+        <item>Transliterated(OT)</item>
+
+
+
+    </string-array>
+    <string-array name="version_code">
+
+        <item>korktv</item>
+        <item>kornkrv_hs</item>
+        <item>korHKJV</item>
+        <item>korhrv</item>
+        <item>kornkrv</item>
+        <item>kornrsv</item>
+        <item>kornkcb</item>
+        <item>koreasy</item>
+        <item>kordob</item>
+        <item>korklb</item>
+        <item>kchhrv</item>
+        <item>korhchv</item>
+        <item>kchnkrv</item>
+        <item>kchktv</item>
+        <item>korcath</item>
+        <item>kortkv</item>
+
+        <item>engNIV</item>
+        <item>ENGKJV</item>
+        <item>engNASB</item>
+        <item>engnlt</item>
+        <item>engesv</item>
+        <item>enggnt</item>
+        <item>enghcsb</item>
+        <item>engmsg</item>
+        <item>engisv</item>
+        <item>engnkjv</item>
+        <item>engnrsv</item>
+        <item>engtniv</item>
+        <item>engdrb</item>
+        <item>engylt</item>
+        <item>engasv</item>
+        <item>engwmt</item>
+        <item>hbrtrl</item>
+
+    </string-array>
+
+
+    <!--
+모세오경(5)     창세기~ 신명기,
+역사서(12)      여호수아 ~ 에스더,
+시가서(5)       욥기 ~ 아가,
+예언서(17)      이사야 ~ 말라기
+4복음서(4)      마태복음 ~ 요한복음
+역사서(1)       사도행전
+편지서          로마서 ~ 빌레몬서
+일반서신        히브리서 ~ 유다서
+예언서          요한계시록
+-->
+    <string-array name="KOR">
+        <item>창세기</item>	<item>출애굽기</item>	<item>레위기</item>	<item>민수기</item>	<item>신명기</item>
+        <item>여호수아</item>	<item>사사기</item>	<item>룻기</item>	<item>사무엘상</item>	<item>사무엘하</item>
+        <item>열왕기상</item>	<item>열왕기하</item>	<item>역대상</item>	<item>역대하</item>	<item>에스라</item>
+        <item>느헤미야</item>	<item>에스더</item>	<item>욥기</item>	<item>시편</item>	<item>잠언</item>
+        <item>전도서</item>	<item>아가</item>	<item>이사야</item>	<item>예레미야</item>	<item>예레미야 애가</item>
+        <item>에스겔</item>	<item>다니엘</item>	<item>호세아</item>	<item>요엘</item>	<item>아모스</item>
+        <item>오바댜</item>	<item>요나</item>	<item>미가</item>	<item>나훔</item>	<item>하박국</item>
+        <item>스바냐</item>	<item>학개</item>	<item>스가랴</item>	<item>말라기</item>
+        <item>마태복음</item>	<item>마가복음</item>	<item>누가복음</item>	<item>요한복음</item><item>사도행전</item>
+        <item>로마서</item>	<item>고린도전서</item>	<item>고린도후서</item>	<item>갈라디아서</item><item>에베소서</item>
+        <item>빌립보서</item>	<item>골로새서</item>	<item>데살로니가전서</item>	<item>데살로니가후서</item><item>디모데전서</item>
+        <item>디모데후서</item>	<item>디도서</item>	<item>빌레몬서</item>	<item>히브리서</item><item>야고보서</item>
+        <item>베드로전서</item>	<item>베드로후서</item>	<item>요한1서</item>	<item>요한2서</item><item>요한3서</item>
+        <item>유다서</item>	<item>요한계시록</item>
+    </string-array>
+
+    <string-array name="KOR_ACM_PARTIAL">
+        <item>창세기</item>	<item>출애굽기</item>	<item>레위기</item>	<item>민수기</item>	<item>신명기</item>
+        <item>여호수아</item>	<item>사사기</item>	<item>룻기</item>	<item>사무엘상</item>	<item>사무엘하</item>
+        <item>열왕기상</item>	<item>열왕기하</item>	<item>역대상</item>	<item>역대하</item>	<item>에스라</item>
+        <item>느헤미야</item>	<item>에스더</item>	<item>욥기</item>	<item>시편</item>	<item>잠언</item>
+        <item>전도서</item>	<item>아가</item>	<item>이사야</item>	<item>예레미야</item>	<item>애가</item>
+        <item>에스겔</item>	<item>다니엘</item>	<item>호세아</item>	<item>요엘</item>	<item>아모스</item>
+        <item>오바댜</item>	<item>요나</item>	<item>미가</item>	<item>나훔</item>	<item>하박국</item>
+        <item>스바냐</item>	<item>학개</item>	<item>스가랴</item>	<item>말라기</item>
+        <item>마태복음</item>	<item>마가복음</item>	<item>누가복음</item>	<item>요한복음</item><item>사도행전</item>
+        <item>로마서</item>	<item>고린도전서</item>	<item>고린도후서</item>	<item>갈라디아서</item><item>에베소서</item>
+        <item>빌립보서</item>	<item>골로새서</item>	<item>살전</item>	<item>살후</item><item>디모데전서</item>
+        <item>디모데후서</item>	<item>디도서</item>	<item>빌레몬서</item>	<item>히브리서</item><item>야고보서</item>
+        <item>베드로전서</item>	<item>베드로후서</item>	<item>요한1서</item>	<item>요한2서</item><item>요한3서</item>
+        <item>유다서</item>	<item>요한계시록</item>
+    </string-array>
+
+    <string-array name="KOR_ACM">
+        <item>창</item>	<item>출</item>	<item>레</item>	<item>민</item>	<item>신</item>
+        <item>수</item>	<item>삿</item>	<item>룻</item>	<item>삼상</item>	<item>삼하</item>
+        <item>왕상</item>	<item>왕하</item>	<item>대상</item>	<item>대하</item>	<item>스</item>
+        <item>느</item>	<item>에</item>	<item>욥</item>	<item>시</item>	<item>잠</item>
+        <item>전</item>	<item>아</item>	<item>사</item>	<item>렘</item>	<item>애</item>
+        <item>겔</item>	<item>단</item>	<item>호</item>	<item>욜</item>	<item>암</item>
+        <item>옵</item>	<item>욘</item>	<item>미</item>	<item>나</item>	<item>합</item>
+        <item>습</item>	<item>학</item>	<item>슥</item>	<item>말</item>
+        <item>마</item>	<item>막</item>	<item>눅</item>	<item>요</item><item>행</item>
+        <item>롬</item>	<item>고전</item>	<item>고후</item>	<item>갈</item><item>엡</item>
+        <item>빌</item>	<item>골</item>	<item>살전</item>	<item>살후</item><item>딤전</item>
+        <item>딤후</item>	<item>딛</item>	<item>몬</item>	<item>히</item><item>약</item>
+        <item>벧전</item>	<item>벧후</item>	<item>요일</item>	<item>요이</item><item>요삼</item>
+        <item>유</item>	<item>계</item>
+    </string-array>
+
+    <string-array name="CATH">
+        <item>창세기</item>	<item>탈출기</item>	<item>레위기</item>	<item>민수기</item>	<item>신명기</item>
+        <item>여호수아기</item>	<item>판관기</item>	<item>룻기</item>	<item>사무엘 상권</item>	<item>사무엘 하권</item>
+        <item>열왕기 상권</item>	<item>열왕기 하권</item>	<item>역대기 상권</item>	<item>역대기 하권</item>	<item>에즈라</item>
+        <item>느헤미야</item>	<item>에스테르기</item>	<item>욥기</item>	<item>시편</item>	<item>잠언</item>
+        <item>코헬렛</item>	<item>아가</item>	<item>이사야서</item>	<item>예레미야서</item>	<item>애가</item>
+        <item>에제키엘서</item>	<item>다니엘서</item>	<item>호세아서</item>	<item>요엘서</item>	<item>아모스서</item>
+        <item>오바드야서</item>	<item>요나서</item>	<item>미카서</item>	<item>나훔서</item>	<item>하바쿡서</item>
+        <item>스바니야서</item>	<item>하까이서</item>	<item>즈카르야서</item>	<item>말라기서</item>
+        <item>마태오 복음서</item>	<item>마르코 복음서</item>	<item>루카 복음서</item>	<item>요한 복음서</item><item>사도행전</item>
+        <item>로마 서간</item>	<item>코린토 서간 1</item>	<item>코린토 서간 2</item>	<item>갈라티아 서간</item><item>에페소 서간</item>
+        <item>필리피 서간</item>	<item>콜로새 서간</item>	<item>테살로니카  1</item>	<item>테살로니카  2</item><item>티모테오 서간 1</item>
+        <item>티모테오 서간 2</item>	<item>티토 서간</item>	<item>필레몬 서간</item>	<item>히브리인 서간</item><item>야고보의 서간</item>
+        <item>베드로의 서간 1</item>	<item>베드로의 서간 2</item>	<item>요한의 서간 1</item>	<item>요한의 서간 2</item><item>요한의 서간 3</item>
+        <item>유다 서간</item>	<item>요한의 묵시록</item>
+    </string-array>
+
+    <string-array name="CATH_ACM">
+        <item>창세</item>	<item>탈출</item>	<item>레위</item>	<item>민수</item>	<item>신명</item>
+        <item>여호</item>	<item>판관</item>	<item>룻</item>	<item>1사무</item>	<item>2사무</item>
+        <item>1열왕</item>	<item>2열왕</item>	<item>1역대</item>	<item>2역대</item>	<item>에즈</item>
+        <item>느헤</item>	<item>에스</item>	<item>욥</item>	<item>시편</item>	<item>잠언</item>
+        <item>코헬</item>	<item>아가</item>	<item>이사</item>	<item>예레</item>	<item>애가</item>
+        <item>에제</item>	<item>다니</item>	<item>호세</item>	<item>요엘</item>	<item>아모</item>
+        <item>오바</item>	<item>요나</item>	<item>미카</item>	<item>나훔</item>	<item>하바</item>
+        <item>스바</item>	<item>하까</item>	<item>즈카</item>	<item>말라</item>
+        <item>마태</item>	<item>마르</item>	<item>루카</item>	<item>요한</item><item>사도</item>
+        <item>로마</item>	<item>1코린</item>	<item>2코린</item>	<item>갈라</item><item>에페</item>
+        <item>필리</item>	<item>콜로</item>	<item>1테살</item>	<item>2테살</item><item>1티모</item>
+        <item>2티모</item>	<item>티토</item>	<item>필레</item>	<item>히브</item><item>야고</item>
+        <item>1베드</item>	<item>2베드</item>	<item>1요한</item>	<item>2요한</item><item>3요한</item>
+        <item>유다</item>	<item>묵시</item>
+    </string-array>
+
+    <string-array name="ENG">
+        <item>Genesis</item>	<item>Exodus</item>	<item>Leviticus</item>	<item>Numbers</item>	<item>Deuteronomy</item>
+        <item>Joshua</item>	<item>Judges</item>	<item>Ruth</item>	<item>1 Samuel</item>	<item>2 Samuel</item>
+        <item>1 Kings</item>	<item>2 Kings</item>	<item>1 Chronicles</item>	<item>2 Chronicles</item>	<item>Ezra</item>
+        <item>Nehemiah</item>	<item>Esther</item>	<item>Job</item>	<item>Psalms</item>	<item>Proverbs</item>
+        <item>Ecclesiastes</item>	<item>Song of Songs</item>	<item>Isaiah</item>	<item>Jeremiah</item>	<item>Lamentations</item>
+        <item>Ezekiel</item>	<item>Daniel</item>	<item>Hosea</item>	<item>Joel</item>	<item>Amos</item>
+        <item>Obadiah</item>	<item>Jonah</item>	<item>Micah</item>	<item>Nahum</item>	<item>Habakkuk</item>
+        <item>Zephaniah</item>	<item>Haggai</item>	<item>Zechariah</item>	<item>Malachi</item>
+        <item>Matthew</item>	<item>Mark</item>	<item>Luke</item>	<item>John</item><item>Acts</item>
+        <item>Romans</item>	<item>1 Corinthians</item>	<item>2 Corinthians</item>	<item>Galatians</item><item>Ephesians</item>
+        <item>Philippians</item>	<item>Colossians</item>	<item>1 Thessalo.</item>	<item>2 Thessalo.</item><item>1 Timothy</item>
+        <item>2 Timothy</item>	<item>Titus</item>	<item>Philemon</item>	<item>Hebrews</item><item>James</item>
+        <item>1 Peter</item>	<item>2 Peter</item>	<item>1 John</item>	<item>2 John</item><item>3 John</item>
+        <item>Jude</item>	<item>Revelation</item>
+    </string-array>
+
+    <string-array name="ENG_ACM">
+        <item>Gn</item>	<item>Ex</item>	<item>Lv</item>	<item>Nm</item>	<item>Dt</item>
+        <item>Jos</item>	<item>Jdg</item>	<item>Ru</item>	<item>1Sm</item>	<item>2Sm</item>
+        <item>1Kg</item>	<item>2Kg</item>	<item>1Ch</item>	<item>2Ch</item>	<item>Ezr</item>
+        <item>Neh</item>	<item>Est</item>	<item>Jb</item>	<item>Ps</item>	<item>Pr</item>
+        <item>Ec</item>	<item>Sg</item>	<item>Is</item>	<item>Jr</item>	<item>Lm</item>
+        <item>Ezk</item>	<item>Dn</item>	<item>Hs</item>	<item>Jl</item>	<item>Am</item>
+        <item>Ob</item>	<item>Jnh</item>	<item>Mc</item>	<item>Nah</item>	<item>Hab</item>
+        <item>Zph</item>	<item>Hg</item>	<item>Zch</item>	<item>Mal</item>
+        <item>Mt</item>	<item>Mk</item>	<item>Lk</item>	<item>Jn</item><item>Ac</item>
+        <item>Rm</item>	<item>1Co</item>	<item>2Co</item>	<item>Gl</item><item>Eph</item>
+        <item>Php</item>	<item>Col</item>	<item>1Th</item>	<item>2Th</item><item>1Tm</item>
+        <item>2Tm</item>	<item>Ti</item>	<item>Phm</item>	<item>Heb</item><item>Jms</item>
+        <item>1Pt</item>	<item>2Pt</item>	<item>1Jn</item>	<item>2Jn</item><item>3Jn</item>
+        <item>Jd</item>	<item>Rv</item>
+    </string-array>
+
+
+
+</resources>
