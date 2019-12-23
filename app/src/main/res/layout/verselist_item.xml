@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/text_number"
-        android:text="1  "
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15dp"/>
-
-    <TextView
-        android:id="@+id/text_verse"
-        android:text="아브라함의 자손이시요, 다윗의 자손이신 그리스도의 세대에 대한 책이라."
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="15dp" />
+        android:orientation="horizontal"
+        android:background="@drawable/selector_view_item"
+        >
 
+        <TextView
+            android:id="@+id/text_number"
+            android:text="1  "
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"/>
+
+        <TextView
+            android:id="@+id/text_verse"
+            android:text="아브라함의 자손이시요, 다윗의 자손이신 그리스도의 세대에 대한 책이라.@!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp" />
+
+
+
+
+    </LinearLayout>
 </LinearLayout>

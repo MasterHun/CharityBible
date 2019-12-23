@@ -5,14 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/fragment"
-        />
+    tools:context=".Activity.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,44 +15,102 @@
 
         <Button
             android:id="@+id/btn1_bottom"
-            android:text="btn1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="12dp"/>
+            android:text="btn1"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btn2_bottom"
-            android:text="btn2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="12dp"/>
+            android:text="btn2"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btn3_bottom"
-            android:text="btn3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="12dp"/>
+            android:text="btn3"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btn4_bottom"
-            android:text="btn4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="12dp"/>
+            android:text="btn4"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/btn5_bottom"
-            android:text="btn5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="12dp"/>
+            android:text="btn5"
+            android:textSize="12sp" />
 
     </LinearLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/fragment"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!--<android.support.design.widget.BottomNavigationView-->
+        <!--android:id="@+id/navigationView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/colorAccent"-->
+        <!--&gt;</android.support.design.widget.BottomNavigationView>-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/colorPrimaryDark"
+            android:id="@+id/linearbottom"
+            android:orientation="vertical">
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_skip_previous_black_24dp" />
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_play_arrow_black_24dp" />
+
+                <!--<ImageButton-->
+                    <!--android:layout_width="40dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:src="@drawable/ic_pause_black_24dp" />-->
+
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_skip_next_black_24dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

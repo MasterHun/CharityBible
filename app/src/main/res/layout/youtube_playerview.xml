@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+    <!--<view-->
+        <!--android:id="@+id/youtubeView"-->
+        <!--class="com.google.android.youtube.player.YouTubePlayerView"-->
+        <!--id="@+id/view"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_weight="1"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--tools:layout_editor_absoluteX="98dp"-->
+        <!--tools:layout_editor_absoluteY="16dp" />-->
+
+    <view
+        android:layout_weight="1"
+        android:id="@+id/item_video"
+        class="com.google.android.youtube.player.YouTubeThumbnailView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"
+        />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvTitle"
+            android:text="Youtube Title"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvContext"
+            android:text="유투브 동영상에 들어가게 될 내용들이 담기게 됩니다."/>
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>

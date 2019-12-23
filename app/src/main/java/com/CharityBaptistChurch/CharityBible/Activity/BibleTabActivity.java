@@ -20,21 +20,27 @@ import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.CharityBaptistChurch.CharityBible.R;
+import com.CharityBaptistChurch.CharityBible.Util;
 
+/*
+* Type : Activity
+* Contents : 성경을 선택하는 액티비티
+* */
 public class BibleTabActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final int TABLE_BUTTON_WIDTH = 7;
 
 
     // 간략하게 보기 탭
-    private TextView mTextSimpleTestament;
+    private Button mTextSimpleTestament;
     private ListView mListSimpleTestament;
 
     // 리스트로 보기 탭
-    private TextView mTextListTestament;
+    private Button mTextListTestament;
     private TableLayout mTableLayout;
 
     private ViewFlipper mFlipper;
@@ -59,17 +65,15 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bibletab);
 
-        mTextSimpleTestament = (TextView) findViewById(R.id.simple_testament);
+        mTextSimpleTestament = (Button) findViewById(R.id.simple_testament);
         mListSimpleTestament = (ListView) findViewById(R.id.list);
 
-        mTextListTestament = (TextView) findViewById(R.id.list_testament);
+        mTextListTestament = (Button) findViewById(R.id.list_testament);
         mTableLayout = (TableLayout) findViewById(R.id.table);
         mTableLayout.setPadding(50, 20, 50, 0);
 
         mFlipper = (ViewFlipper) findViewById(R.id.flipper);
         mListSimpleTestament.setOnItemClickListener(listener);
-
-        // 자판치면 필터되게 <-- ??
 
         mListSimpleTestament.setTextFilterEnabled(true);
 
@@ -94,6 +98,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
 
         int nCount = 0;
 
+        // 테이블 형태로 된 버튼 목록 생성
         while (nCount < orginalAcms.length) {
 
             final TableRow tableRow = new TableRow(this);
@@ -114,23 +119,24 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
                             return;
                         }
 
-                        //Toast.makeText(getApplicationContext(),btn.getText(),Toast.LENGTH_LONG).show();
-        //                String strBible = (String) btn.getText();
-      //                  int nBiblePosition = findBiblePosition(strBible, "KOR_ACM");
-    //                    final String[] bible = getResources().getStringArray(R.array.KOR);
-  //                      strBible = bible[nBiblePosition];
-//                        nBiblePosition =  Util.numOfChapters[nBiblePosition];
+                        Toast.makeText(getApplicationContext(),btn.getText(),Toast.LENGTH_LONG).show();
+                        String strBible = (String) btn.getText();
+                        int nBiblePosition = findBiblePosition(strBible, "KOR_ACM");
+                        final String[] bible = getResources().getStringArray(R.array.KOR);
+                        strBible = bible[nBiblePosition];
+                        nBiblePosition =  Util.numOfChapters[nBiblePosition];
 
-//                        Intent i = new Intent(getApplicationContext(), ChapterTable.class);
+                        Intent i = new Intent(getApplicationContext(), ChapterTableActivity.class);
 
-  //                      i.putExtra("bookPosition", nBiblePosition);
-    //                    i.putExtra("bookName", strBible);
+                        i.putExtra("bookPosition", nBiblePosition);
+                        i.putExtra("bookName", strBible);
 
-      //                  startActivity(i);
+                        startActivity(i);
 
                     }
                 });
                 btn.setText(orginalAcms[nCount]);
+                btn.setTextSize(12);
                 btn.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
                 tableRow.addView(btn);
 
@@ -140,7 +146,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
                 }
                 nCount++;
             }
-            tableRow.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
+            tableRow.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT));
             mTableLayout.addView(tableRow);
         }
 
@@ -209,13 +215,13 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
                 return;
             }
 
-         //   Intent i = new Intent(getBaseContext(), ChapterTable.class);
+            Intent i = new Intent(getBaseContext(), ChapterTableActivity.class);
 
-        //    int nidx = findBiblePosition(mListSimpleTestament.getItemAtPosition(position).toString(), "KOR");
-      //      int nPos = Util.numOfChapters[nidx];
-    //        i.putExtra("bookPosition", nPos);
-  //          i.putExtra("bookName", mListSimpleTestament.getItemAtPosition(position).toString());
-//            startActivity(i);
+            int nidx = findBiblePosition(mListSimpleTestament.getItemAtPosition(position).toString(), "KOR");
+            int nPos = Util.numOfChapters[nidx];
+            i.putExtra("bookPosition", nPos);
+           i.putExtra("bookName", mListSimpleTestament.getItemAtPosition(position).toString());
+            startActivity(i);
         }
     };
 
@@ -223,19 +229,20 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
     // 버튼 클릭할때마다 색상이 변경되게.
     void setButtonStyle() {
         if (mIsSelected) {
-            mTextListTestament.setTypeface(mTextListTestament.getTypeface(), Typeface.BOLD);
-            mTextListTestament.setTextColor(Color.WHITE);
-            mTextListTestament.setBackgroundColor(Color.BLACK);
-            mTextSimpleTestament.setTypeface(null, Typeface.NORMAL);
-            mTextSimpleTestament.setTextColor(Color.BLACK);
-            mTextSimpleTestament.setBackgroundColor(Color.DKGRAY);
-        } else {
             mTextSimpleTestament.setTypeface(mTextSimpleTestament.getTypeface(), Typeface.BOLD);
             mTextSimpleTestament.setTextColor(Color.WHITE);
-            mTextSimpleTestament.setBackgroundColor(Color.BLACK);
+          //  mTextSimpleTestament.setBackgroundColor(Color.BLACK);
             mTextListTestament.setTypeface(null, Typeface.NORMAL);
             mTextListTestament.setTextColor(Color.BLACK);
-            mTextListTestament.setBackgroundColor(Color.DKGRAY);
+           // mTextListTestament.setBackgroundColor(Color.DKGRAY);
+        } else {
+            mTextListTestament.setTypeface(mTextListTestament.getTypeface(), Typeface.BOLD);
+            mTextListTestament.setTextColor(Color.WHITE);
+           // mTextListTestament.setBackgroundColor(Color.BLACK);
+            mTextSimpleTestament.setTypeface(null, Typeface.NORMAL);
+            mTextSimpleTestament.setTextColor(Color.BLACK);
+           // mTextSimpleTestament.setBackgroundColor(Color.DKGRAY);
+
         }
     }
 

@@ -3,4 +3,16 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="colorGreen">#00FF00</color>
+    <color name="colorBlue">#0000FF</color>
+    <color name="ItemPressedColor">#8EE2FB</color>
+    <color name="ItemSelectedColor">#f4f4f4</color>
+
+    <color name="normal_item_bg">#FFFFFFFF</color>
+    <color name="selected_item_bg">#FF0000FF</color>
+
+
 </resources>

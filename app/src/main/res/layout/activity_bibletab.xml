@@ -14,57 +14,58 @@
 
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="60dp"
+            android:layout_height="45dp"
             android:layout_marginBottom="0px"
             android:layout_marginTop="0px"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorAccent"
             android:padding="0px">
 
-            <Button
-                android:id="@+id/overflow"
-                android:layout_width="40dp"
-                android:layout_height="fill_parent"
-                android:textColor="@android:color/holo_blue_dark"
-                android:layout_alignParentLeft="true"
-                android:text="←"
-                android:textSize="22sp"/>
+            <!--<Button-->
+                <!--android:id="@+id/overflow"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:gravity="center"-->
+                <!--android:textColor="@android:color/holo_blue_dark"-->
+                <!--android:layout_alignParentLeft="true"-->
+                <!--android:layout_margin="5dp"-->
+                <!--android:text="뒤로"-->
+                <!--android:textSize="10sp"/>-->
 
             <LinearLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginBottom="-6px"
+                android:layout_height="40dp"
                 android:layout_marginTop="0px"
                 android:layout_gravity="center_horizontal"
                 android:layout_centerInParent="true"
                 android:padding="0px">
 
-                <TextView
-                    android:id="@+id/simple_testament"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:paddingTop="5dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:text="간략보기"
-                    android:textColor="@android:color/holo_red_light"
-                    android:background="@android:color/white"
-                    android:textSize="27sp"
-                    />
-
-                <TextView
+                <Button
                     android:id="@+id/list_testament"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:paddingTop="5dp"
+                    android:layout_margin="5dp"
                     android:gravity="center"
                     android:textStyle="bold"
                     android:text="목록보기"
                     android:textColor="@android:color/holo_red_light"
-                    android:background="@android:color/white"
-                    android:textSize="27sp"/>
+                    android:background="@color/colorPrimaryDark"
+                    android:textSize="20sp"/>
+
+                <Button
+                    android:id="@+id/simple_testament"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="간략보기"
+                    android:textColor="@android:color/holo_red_light"
+                    android:background="@color/colorPrimaryDark"
+                    android:textSize="20sp"
+                    />
+
+
 
 
             </LinearLayout>
