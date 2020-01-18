@@ -7,7 +7,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -35,7 +37,11 @@ import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_ReadBible;
 import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_Search;
 import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_Setting;
 import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_Youtube;
+import com.CharityBaptistChurch.CharityBible.MusicPlayer;
 import com.CharityBaptistChurch.CharityBible.R;
+import com.CharityBaptistChurch.CharityBible.Util;
+
+import java.io.File;
 
 
 public class MainActivity extends AppCompatActivity implements Button.OnClickListener {
@@ -43,9 +49,12 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     private ListView listviewVerse;
     private Button btn1_top, btn2_top, btn3_top;
     private Button btn1_bottom, btn2_bottom, btn3_bottom, btn4_bottom, btn5_bottom;
-    private ImageButton imgbtn_mp3_top, imgbtn_moremenu_top;
-    private LinearLayout linear_bottom;
+    private ImageButton ibtn_mp3_top, ibtn_moremenu_top, ibtnPrevious, ibtnPreview, ibtnPlay;
+    private LinearLayout linear_Miniplayer;
     private boolean bMusicbuttonflag;
+
+    public String m_strContents = "창세기";
+    public String m_strChapter = "1";
 
     public Fragment_ReadBible fr = new Fragment_ReadBible();
   //  FragmentManager fm = getSupportFragmentManager();
@@ -60,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
     ActionBar actionBar;
 
+    MusicPlayer mp;
+    boolean bPlayFlge = false;
     int i = 0;
     // #Action bar 커스텀
     @Override
@@ -81,18 +92,25 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         // action bar 공백 없애주기
         parent.setContentInsetsAbsolute(0,0);
 
-        imgbtn_mp3_top = (ImageButton) findViewById(R.id.imgbtn_mp3_top);
-        imgbtn_mp3_top.setOnClickListener(this);
-        imgbtn_moremenu_top = (ImageButton) findViewById(R.id.imgbtn_moremenu_top);
+        ibtn_mp3_top = (ImageButton) findViewById(R.id.ibtn_mp3_top);
+        ibtn_mp3_top.setOnClickListener(this);
+        ibtn_moremenu_top = (ImageButton) findViewById(R.id.ibtn_moremenu_top);
         btn1_top = (Button) findViewById(R.id.btn1_top);
         btn1_top.setOnClickListener(this);
-        btn1_top.setText("레위기▼");
+        btn1_top.setText(m_strContents+"▼");
         btn2_top = (Button) findViewById(R.id.btn2_top);
         btn2_top.setOnClickListener(this);
-        btn2_top.setText("1장▼");
+        btn2_top.setText(m_strChapter+"장▼");
         btn3_top = (Button) findViewById(R.id.btn3_top);
         btn3_top.setOnClickListener(this);
         btn3_top.setText("KORHKJV▼");
+
+        ibtnPreview = (ImageButton) findViewById(R.id.ibtnPreview);
+        ibtnPreview.setOnClickListener(this);
+        ibtnPrevious = (ImageButton) findViewById(R.id.ibtnPrevious);
+        ibtnPrevious.setOnClickListener(this);
+        ibtnPlay = (ImageButton) findViewById(R.id.ibtnPlay);
+        ibtnPlay.setOnClickListener(this);
 
         //        return super.onCreateOptionsMenu(menu);
         return true;
@@ -102,29 +120,15 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     protected void onStart() {
         super.onStart();
 
+        Log.i("MainActivity","OnStart()");
 
-    }
+        fm = getSupportFragmentManager();
+        tran = fm.beginTransaction();
+        tran.replace(R.id.fragment, frag_readbible);
+        tran.commit();
+        // actionBar.show();
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-        int nChapter = 0 ;
-        String strSection = null;
-        Log.i("Test_Debuge","OnResume");
-
-        Intent intent = getIntent();
-        if( intent.getExtras() != null ) {
-            Log.i("Test_Debuge","intent 값받아옴");
-         //   nChapter = intent.getint("Chapter");
-            strSection = intent.getStringExtra("Section");
-            Log.i("Test_Debuge",strSection+":"+nChapter);
-        }
-        if( nChapter > 0)
-        {
-            Log.i("Test_Debuge","찍힘 Here");
-            Toast.makeText(getApplicationContext(), strSection,Toast.LENGTH_SHORT).show();
-        }
 
     }
 
@@ -134,9 +138,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         setContentView(R.layout.activity_main);
 
         checkVerify();
-     //   listviewVerse = (ListView) findViewById(R.id.listview1);
+        Log.i("MainActivity","OnCreate()");
+        //   listviewVerse = (ListView) findViewById(R.id.listview1);
 
-        linear_bottom = (LinearLayout) findViewById(R.id.linearbottom);
+        linear_Miniplayer = (LinearLayout) findViewById(R.id.lineaMiniplayer);
         bMusicbuttonflag = false;
 
         btn1_bottom = (Button) findViewById(R.id.btn1_bottom);
@@ -147,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         btn2_bottom.setOnClickListener(this);
         btn2_bottom.setText("검색");
 
-        btn3_bottom = (Button) findViewById(R.id.btn3_bottom);
-        btn3_bottom.setOnClickListener(this);
-        btn3_bottom.setText("부록");
+//        btn3_bottom = (Button) findViewById(R.id.btn3_bottom);
+//        btn3_bottom.setOnClickListener(this);
+//        btn3_bottom.setText("부록");
 
         btn4_bottom = (Button) findViewById(R.id.btn4_bottom);
         btn4_bottom.setOnClickListener(this);
@@ -165,43 +170,78 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         frag_setting = new Fragment_Setting();
 
 
-//        FragmentManager fm = getSupportFragmentManager();
-//        FragmentTransaction transaction = fm.beginTransaction();
-//        transaction.replace(R.id.fragment, fr);
-//        transaction.commit();
-
-
-//        VerseListAdapter adapter;
-//        adapter = new VerseListAdapter();
-
-//        listviewVerse.setAdapter(adapter);
-
-//        ListFragment listFragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.listfragment);
-//        listFragment.setListAdapter(adapter);
-//
-//        // #테스트 성경구절 삽입
-//        adapter.addItem("1  ","예수 그리스도의 종 바울은 사도로 부르심을 받아 [하나님]의 복음을 위해 구별되었는데 ");
-//        adapter.addItem("2  ","(이 복음은 그분께서 자신의 대언자들을 통하여 거룩한 성경 기록들에 미리 약속하신 것으로)");
-//        adapter.addItem("3  ","자신의 [아들] 예수 그리스도 우리 [주]에 관한 것이라. 그분께서는 육체로는 다윗의 씨에서 나셨고");
-//        adapter.addItem("4  ","거룩함의 영으로는 죽은 자들로부터 부활하심으로써 [하나님]의 [아들]로 권능 있게 밝히 드러나셨느니라.");
-//        adapter.addItem("5  ","그분으로 말미암아 우리가 은혜와 사도직을 받아 그분의 이름을 위하여 모든 민족들 가운데서 믿음에 순종하게 하였나니");
-//        adapter.addItem("6  ","너희도 그들 가운데서 예수 그리스도의 부르심을 받았느니라.");
-//        adapter.addItem("7  ","바울은, 로마에서 [하나님]께 사랑을 받고 성도로 부르심을 받은 모든 사람에게 편지하노니 [하나님] 우리 [아버지]와 [주] 예수 그리스도로부터 은혜와 평강이 너희에게 있기를 원하노라.");
-//        adapter.addItem("8  ","먼저 너희 모두로 인하여 예수 그리스도를 통해 나의 [하나님]께 감사하노니 이는 너희의 믿음이 온 세상에 두루 전하여졌기 때문이라.");
-//        adapter.addItem("9  ","내가 그분의 [아들]의 복음 안에서 내 영으로 섬기는 [하나님]께서 내 증인이 되시거니와 내가 기도할 때에 언제나 너희에 관하여 끊임없이 말하며");
-//        adapter.addItem("10  ","어찌하든지 이제라도 마침내 [하나님]의 뜻에 따라 순탄한 여정을 얻어 너희에게 가게 되기를 간구하노라.");
-//        adapter.addItem("11  ","내가 너희를 간절히 보고자 함은 내가 너희에게 어떤 영적 선물을 나누어 주어 너희를 굳게 세우고자 함이니");
-//        adapter.addItem("12  ","이것은 곧 너희와 나 사이의 공통된 믿음으로 말미암아 내가 너희와 함께 위로를 받고자 함이라.");
-//        adapter.addItem("13  ","형제들아, 이제 나는 너희가 이것을 모르기를 원치 아니하노니 곧 내가 너희 가운데서도 다른 이방인들 가운데서처럼 어떤 열매를 얻기 위해 여러 번 너희에게 가고자 하였으나 (이제껏 막혔도다.)");
-//        adapter.addItem("14  ","나는 그리스인이나 바바리인이나 지혜 있는 자나 지혜 없는 자에게 다 빚진 자니라.");
-//        adapter.addItem("15  ","그러므로 내 안에 있는 분량대로 나는 또한 로마에 있는 너희에게 복음을 선포할 준비가 되어 있노라.");
-//        adapter.addItem("16  ","내가 그리스도의 복음을 부끄러워하지 아니하노니 이는 그 복음이 믿는 모든 자를 구원에 이르게 하는 [하나님]의 권능이기 때문이라. 먼저는 유대인에게요 또한 그리스인에게로다.");
-//        adapter.addItem("17  ","복음에는 [하나님]의 의가 믿음에서 믿음까지 계시되어 있나니 이것은 기록된바, 의인은 믿음으로 살리라, 함과 같으니라.");
+        // *미니플레이어를 숨김
+        bMusicbuttonflag = false;
+        linear_Miniplayer.setVisibility(View.INVISIBLE);
 
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String strChapter = "" ;
+        String strContents = "";
+        int nChapter = 0;
+
+        Log.i("MainActivity","OnResume()");
+
+        Intent intent = getIntent();
+        if( intent.getExtras() != null ) {
+            Log.i("MainActivity","intent 값받아옴");
+            strChapter = intent.getStringExtra("Chapter");      // 성경 장
+            strContents = intent.getStringExtra("Contents");     // 성경 전서
+            Log.i("MainActivity",strContents+":"+strChapter);
+
+            if(!strChapter.isEmpty())
+                nChapter = Integer.parseInt(strChapter);
+
+            if( nChapter > 0)
+            {
+                m_strChapter = strChapter;
+                Log.i("MainActivity","찍힘 Here");
+                Toast.makeText(getApplicationContext(), strContents,Toast.LENGTH_SHORT).show();
+            }
+
+            if(strContents != null)
+            {
+                m_strContents = strContents;
+            }
+               Fragment_ReadBible fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.fragment);
+               fragmentReadBible.init(m_strContents,m_strChapter);
+        }
+
+
+
+
+    }
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("MainActivity","OnPause()");
+    }
+
     private void init()
     {
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (resultCode)
+        {
+            case 1:
+                String key = data.getStringExtra("key");
+                break;
+            case 2:
+                break;
+        }
 
     }
 
@@ -210,15 +250,16 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         switch (v.getId())
         {
+
             case R.id.btn1_bottom:
                 setFrag(0);
                 break;
             case R.id.btn2_bottom:
                 setFrag(1);
                 break;
-            case R.id.btn3_bottom:
-                setFrag(2);
-                break;
+//            case R.id.btn3_bottom:
+//                setFrag(2);
+//                break;
             case R.id.btn4_bottom:
                 setFrag(3);
                 break;
@@ -226,25 +267,97 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                 setFrag(4);
                 break;
             case R.id.btn1_top:
-                Intent it = new Intent(getApplicationContext(), BibleTabActivity.class);
-                startActivity(it);
+                Intent it_1 = new Intent(getApplicationContext(), BibleTabActivity.class);
+                startActivity(it_1);
                 break;
             case R.id.btn2_top:
-                //Intent it = new Intent(getApplicationContext(), );
+                Intent it_2 = new Intent(getApplicationContext(), ChapterTableActivity.class);
+
+
+                String strBible = "";
+                int nBiblePosition = findBiblePosition(m_strContents, "KOR");
+                final String[] bible = getResources().getStringArray(R.array.KOR);
+                strBible = bible[nBiblePosition];
+                nBiblePosition =  Util.numOfChapters[nBiblePosition];
+
+                it_2.putExtra("bookPosition", nBiblePosition);
+                it_2.putExtra("bookName", strBible);
+
+                startActivity(it_2);
                 break;
-            case R.id.imgbtn_mp3_top:
+            case R.id.ibtn_mp3_top:
                 if(bMusicbuttonflag) {
-                    linear_bottom.setVisibility(View.INVISIBLE);
+                    linear_Miniplayer.setVisibility(View.INVISIBLE);
                     bMusicbuttonflag = false;
+
+
                 }
                 else {
-                    linear_bottom.setVisibility(View.VISIBLE);
+                    linear_Miniplayer.setVisibility(View.VISIBLE);
                     bMusicbuttonflag = true;
-                }
 
+                    File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                    String strDir = file.getAbsolutePath();
+
+                    String strPath  = strDir + "/bible_mp3";
+                    mp = new MusicPlayer(strPath);
+                    mp.initMusic();
+                }
                 break;
+            case R.id.ibtnPreview:
+                if(mp != null)
+                {
+                    mp.onPreview();
+                }
+                break;
+            case R.id.ibtnPlay:
+                if(mp != null)
+                {
+                    mp.onPlay();
+
+                    if(bPlayFlge)
+                        ibtnPlay.setImageResource(R.drawable.ic_pause_black_24dp);
+                    else
+                        ibtnPlay.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                }
+                break;
+            case R.id.ibtnPrevious:
+                if(mp != null)
+                {
+                    mp.onPrevious();
+                }
+                break;
+
         }
 
+    }
+
+    // @@Function
+    // 성경 배열로 정리
+    // - 필요한 목록은 추가로 입력하면됨.
+    // - 시간되면 유틸쪽으로 옮겨도 될거같아보임
+    int findBiblePosition(String a_strBibleName, String a_strBibleSelecter) {
+        switch (a_strBibleSelecter) {
+            case "KOR": {
+                final String[] bible = getResources().getStringArray(R.array.KOR);
+
+                for (int i = 0; i < bible.length; i++) {
+                    if (bible[i].equals(a_strBibleName)) {
+                        return i;
+                    }
+                }
+            }
+            case "KOR_ACM": {
+                final String[] bible_ACM = getResources().getStringArray(R.array.KOR_ACM);
+
+                for (int i = 0; i < bible_ACM.length; i++) {
+                    if (bible_ACM[i].equals(a_strBibleName)) {
+                        return i;
+                    }
+                }
+            }
+        }
+        return -1;
     }
 
     public void setFrag(int n){
@@ -254,19 +367,9 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         Animation animation;
 
         switch(n) {
-            case 0:
-//                animation= new AlphaAnimation(0,1);
- //               animation.setDuration(1000);
+            case 0:     // *성경읽기
                 tran.replace(R.id.fragment, frag_readbible);
                 tran.commit();
-//                btn1_top.setVisibility(View.VISIBLE);
-//                btn2_top.setVisibility(View.VISIBLE);
-//                btn3_top.setVisibility(View.VISIBLE);
-//                imgbtn_moremenu_top.setVisibility(View.VISIBLE);
-//                imgbtn_mp3_top.setVisibility(View.VISIBLE);
-//                btn1_top.setAnimation(animation);
-//                btn2_top.setAnimation(animation);
-//                btn3_top.setAnimation(animation);
                 actionBar.show();
                 break;
             case 1:
@@ -287,18 +390,20 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 //                btn3_top.setAnimation(animation);
 
                 break;
-            case 2:
-                //tran.replace(R.id.fragment, frag_readbible);
-                //tran.commit();
-                Toast.makeText(getApplicationContext(),"준비중인 기능입니다.",Toast.LENGTH_SHORT).show();
-                break;
+//            case 2:
+//                //tran.replace(R.id.fragment, frag_readbible);
+//                //tran.commit();
+//                Toast.makeText(getApplicationContext(),"준비중인 기능입니다.",Toast.LENGTH_SHORT).show();
+//                break;
             case 3:
                 tran.replace(R.id.fragment, frag_youtube);
                 tran.commit();
+                actionBar.hide();
                 break;
             case 4:
                 tran.replace(R.id.fragment, frag_setting);
                 tran.commit();
+                actionBar.hide();
                 break;
 
         }

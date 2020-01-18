@@ -4,7 +4,7 @@
         <color android:color="@color/normal_item_bg" />
     </item>
     <item android:state_selected="true">
-        <color android:color="@color/selected_item_bg" />
+        <color android:color="@color/selected_item_bg1" />
     </item>
 
 </selector>

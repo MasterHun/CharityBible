@@ -119,7 +119,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
                             return;
                         }
 
-                        Toast.makeText(getApplicationContext(),btn.getText(),Toast.LENGTH_LONG).show();
+                    //    Toast.makeText(getApplicationContext(),btn.getText(),Toast.LENGTH_LONG).show();
                         String strBible = (String) btn.getText();
                         int nBiblePosition = findBiblePosition(strBible, "KOR_ACM");
                         final String[] bible = getResources().getStringArray(R.array.KOR);

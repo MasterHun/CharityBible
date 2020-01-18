@@ -17,7 +17,7 @@
             android:layout_height="45dp"
             android:layout_marginBottom="0px"
             android:layout_marginTop="0px"
-            android:background="@color/colorAccent"
+            android:background="@color/colorPrimaryDark"
             android:padding="0px">
 
             <!--<Button-->

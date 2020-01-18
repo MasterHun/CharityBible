@@ -122,11 +122,10 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
     private OnListItemSelectedInterface mListener;
     private OnListItemLongSelectedInterface mLongListener;
 
-
     private SparseBooleanArray mSelectedItems = new SparseBooleanArray(0);
 
     Context mContext;
-    List<String> mdata;
+    List<String> mdataVerse, mdataNumber;
     RecyclerView recyclerView;
 
     public VerseRecyclerViewAdapter(Context context
@@ -139,14 +138,18 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
         this.recyclerView = recyclerView;
     }
 
-    public void setData(List<String> data) {
-        mdata = data;
+    public void setData(List<String> dataNumber, List<String> dataVerse) {
+        Log.i("Verse_Adapter","setData");
+        mdataVerse = dataVerse;
+        mdataNumber = dataNumber;
+
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public StdViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.i("Verse_Adapter","OnCreateViewHolder");
         LayoutInflater inflate = LayoutInflater.from(mContext);
         View view = inflate.inflate(R.layout.verselist_item, parent, false);
 
@@ -154,30 +157,29 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
         return vh;
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull StdViewHolder holder, int position) {
-        holder.textView.setText(mdata.get(position));
 
-        holder.itemView.setSelected(isItemSelected(position));
-    }
 
     @Override
     public int getItemCount() {
-        return mdata.size();
+        Log.i("Verse_Adapter","getItemCount");
+        return mdataVerse.size();
     }
 
     public class StdViewHolder extends RecyclerView.ViewHolder {
-        public TextView textView;
+        public TextView textVerse;
+        public TextView textNumber;
 
         public StdViewHolder(@NonNull View itemView) {
             super(itemView);
-            this.textView = itemView.findViewById(R.id.text_verse);
+            this.textVerse= itemView.findViewById(R.id.text_verse);
+            this.textNumber= itemView.findViewById(R.id.text_number);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     toggleItemSelected(position);
+                    mListener.onItemSelected(v, getAdapterPosition());
 
                     Log.d("test", "position = " + position);
                 }
@@ -193,8 +195,17 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
         }
     }
 
-    private void toggleItemSelected(int position) {
+    @Override
+    public void onBindViewHolder(@NonNull StdViewHolder holder, int position) {
+        Log.i("Verse_Adapter","OnBindViewHolder");
 
+        holder.textVerse.setText(mdataVerse.get(position));
+        holder.textNumber.setText(mdataNumber.get(position));
+        holder.itemView.setSelected(isItemSelected(position));
+    }
+
+    private void toggleItemSelected(int position) {
+        Log.i("Verse_Adapter","toggleItemSelected");
         if (mSelectedItems.get(position, false) == true) {
             mSelectedItems.delete(position);
             notifyItemChanged(position);

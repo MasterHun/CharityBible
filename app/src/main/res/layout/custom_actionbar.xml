@@ -28,7 +28,7 @@
         android:text="Btn3"/>
 
     <ImageButton
-        android:id="@+id/imgbtn_moremenu_top"
+        android:id="@+id/ibtn_moremenu_top"
         android:layout_centerInParent="true"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -37,13 +37,12 @@
         />
 
     <ImageButton
-        android:id="@+id/imgbtn_mp3_top"
+        android:id="@+id/ibtn_mp3_top"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_centerVertical="true"
         android:layout_marginEnd="0dp"
-        android:layout_toStartOf="@+id/imgbtn_moremenu_top"
-        android:layout_toLeftOf="@id/imgbtn_moremenu_top"
+        android:layout_toLeftOf="@+id/ibtn_moremenu_top"
         android:background="@drawable/ic_volume_black_24dp" />
 
 

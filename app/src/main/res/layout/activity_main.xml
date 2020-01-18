@@ -29,13 +29,13 @@
             android:text="btn2"
             android:textSize="12sp" />
 
-        <Button
-            android:id="@+id/btn3_bottom"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="btn3"
-            android:textSize="12sp" />
+        <!--<Button-->
+            <!--android:id="@+id/btn3_bottom"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="btn3"-->
+            <!--android:textSize="12sp" />-->
 
         <Button
             android:id="@+id/btn4_bottom"
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center_horizontal"
             android:background="@color/colorPrimaryDark"
-            android:id="@+id/linearbottom"
+            android:id="@+id/lineaMiniplayer"
             android:orientation="vertical">
 
             <SeekBar
@@ -91,22 +91,19 @@
 
                 <ImageButton
                     android:layout_width="40dp"
+                    android:id="@+id/ibtnPrevious"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_skip_previous_black_24dp" />
 
                 <ImageButton
                     android:layout_width="40dp"
+                    android:id="@+id/ibtnPlay"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_play_arrow_black_24dp" />
 
-                <!--<ImageButton-->
-                    <!--android:layout_width="40dp"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:src="@drawable/ic_pause_black_24dp" />-->
-
-
                 <ImageButton
                     android:layout_width="40dp"
+                    android:id="@+id/ibtnPreview"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_skip_next_black_24dp" />
             </LinearLayout>

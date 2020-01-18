@@ -27,7 +27,7 @@ import com.CharityBaptistChurch.CharityBible.Util;
  * */
 public class ChapterTableActivity extends AppCompatActivity {
 
-    private String strSection;
+    private String strBibleContents;
     private int nBibleChapter;
 
     @Override
@@ -67,48 +67,41 @@ public class ChapterTableActivity extends AppCompatActivity {
                     return;
                 }
 
-                String strChapter = ((TextView) v).getText().toString();
-            //    Toast.makeText(getApplicationContext(), strChapter, Toast.LENGTH_LONG).show();
+                // 사용자가 선택한 장수
+                String strBibleSelectedChapter  = ((TextView) v).getText().toString();
 
-//                Fragment_ReadBible fr  = new Fragment_ReadBible();
-//                Bundle bundle = new Bundle();
-//                bundle.putString("bookName",Util.strBibleName);
-//                bundle.putString("bookChapter",strChapter);
-//                fr.setArguments(bundle);
-
-//                MainActivity m = new MainActivity();
-  //              Bundle bundle = new Bundle();
-    //            String str = "key";
-      //          int nIndex = 1000;
-        //        bundle.putInt(str, nIndex);
-          //      m.fr.setArguments(bundle);
+                if( Integer.parseInt(strBibleSelectedChapter) < 9)
+                {
+                    strBibleSelectedChapter = "0" +strBibleSelectedChapter;
+                }
 
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                Log.i("Test_Debuge","ChapterTableActivity onClickListener");
-                intent.putExtra("Section", nBibleChapter);
-                intent.putExtra("Chapter", strSection);
+                int nBibleSelectedChapter = Integer.parseInt(strBibleSelectedChapter);
 
-                startActivity(intent);
-                finish();
+                if( nBibleSelectedChapter > 0 &&  strBibleContents != null ) {
 
+                    Log.i("ChapterTable", "ChapterTableActivity onClickListener");
+                    intent.putExtra("Chapter", strBibleSelectedChapter);
+                    intent.putExtra("Contents", strBibleContents);
+                    startActivity(intent);
 
-
+                }
+                //finish();
             }
-
         };
 
         Intent intent = getIntent();
         nBibleChapter = intent.getExtras().getInt("bookPosition");    // 각 성경마다 장수 ex) 창세기 == 50장
-        strSection = intent.getExtras().getString("bookName");   // 성경이 넘어온다. '창세기'
+        strBibleContents= intent.getExtras().getString("bookName");   // 성경이 넘어온다. '창세기'
 
 
         // 성경저장
-        Util.strBibleName = strSection;
+        Util.strBibleName = strBibleContents;
 
         final TextView tv = (TextView) findViewById(R.id.book_name);
-        tv.setText(strSection);
+        tv.setText(strBibleContents);
 
         // 8*8 타일형태로 장수 배열
         int nX = nBibleChapter / 8;

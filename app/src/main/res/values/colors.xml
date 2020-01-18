@@ -12,7 +12,12 @@
     <color name="ItemSelectedColor">#f4f4f4</color>
 
     <color name="normal_item_bg">#FFFFFFFF</color>
-    <color name="selected_item_bg">#FF0000FF</color>
+    <color name="selected_item_bg1">#6AFAA2</color>
+    <color name="selected_item_bg2">#FFC265</color>
+    <color name="selected_item_bg3">#BFF074</color>
+    <color name="selected_item_bg4">#BF65FF</color>
+    <color name="selected_item_bg5">#65E0FF</color>
+
 
 
 </resources>

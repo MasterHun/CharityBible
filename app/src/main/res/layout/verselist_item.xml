@@ -20,7 +20,7 @@
 
         <TextView
             android:id="@+id/text_verse"
-            android:text="아브라함의 자손이시요, 다윗의 자손이신 그리스도의 세대에 대한 책이라.@!@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+            android:text="말씀구절"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="15dp" />
