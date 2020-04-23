@@ -136,7 +136,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
                     }
                 });
                 btn.setText(orginalAcms[nCount]);
-                btn.setTextSize(12);
+                btn.setTextSize(15);
                 btn.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
                 tableRow.addView(btn);
 

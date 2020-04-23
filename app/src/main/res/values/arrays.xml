@@ -9,6 +9,26 @@
     </string-array>
 
 
+    <!--
+
+    1) 개역한글판(korHRV), 개역개정판(korNKRV), 새번역(korNRSV),
+
+    공동번역개정판(korNKCB), 개역개정 국한문(kchNRKV), 개역한글판 국한문(kchHRV)
+
+
+    2) 바른성경(korKTV), 바른성경국한문(kchKTV), 가톨릭성경(korCath), 우리말성경(korDOB), 쉬운성경(korEASY)
+
+
+    3) 킹제임스흠정역(korHKJV), 한글킹제임스(korKKJV), 현대인의 성경(korKLB), 현대어성경(korTKV)
+
+
+    4) ESV, GNT, HCSB, KJV, MSG, ISV
+
+
+    5) NASB, NIV, NKJV, NLT, NRSV, TNIV
+
+    -->
+
     <string-array name="versions">
 
         <!-- 공백이 있으면 절대 안된다. -->
@@ -117,6 +137,23 @@
         <item>디모데후서</item>	<item>디도서</item>	<item>빌레몬서</item>	<item>히브리서</item><item>야고보서</item>
         <item>베드로전서</item>	<item>베드로후서</item>	<item>요한1서</item>	<item>요한2서</item><item>요한3서</item>
         <item>유다서</item>	<item>요한계시록</item>
+    </string-array>
+
+    <string-array name="KOR_LEN">
+        <item>50</item>	<item>40</item>	<item>27</item>	<item>36</item>	<item>34</item>
+        <item>24</item>	<item>21</item>	<item>4</item>	<item>31</item>	<item>24</item>
+        <item>22</item>	<item>25</item>	<item>29</item>	<item>36</item>	<item>10</item>
+        <item>13</item>	<item>10</item>	<item>42</item>	<item>150</item>	<item>31</item>
+        <item>12</item>	<item>8</item>	<item>66</item>	<item>52</item>	<item>5</item>
+        <item>48</item>	<item>12</item>	<item>14</item>	<item>3</item>	<item>9</item>
+        <item>1</item>	<item>4</item>	<item>7</item>	<item>3</item>	<item>3</item>
+        <item>3</item>	<item>2</item>	<item>14</item>	<item>4</item>
+        <item>28</item>	<item>16</item>	<item>24</item>	<item>21</item><item>28</item>
+        <item>16</item>	<item>16</item>	<item>13</item>	<item>6</item><item>6</item>
+        <item>4</item>	<item>4</item>	<item>5</item>	<item>3</item><item>6</item>
+        <item>4</item>	<item>3</item>	<item>1</item>	<item>13</item><item>5</item>
+        <item>5</item>	<item>3</item>	<item>5</item>	<item>1</item><item>1</item>
+        <item>1</item>	<item>22</item>
     </string-array>
 
     <string-array name="KOR_ACM_PARTIAL">

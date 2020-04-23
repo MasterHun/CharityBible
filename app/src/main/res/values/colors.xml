@@ -18,6 +18,12 @@
     <color name="selected_item_bg4">#BF65FF</color>
     <color name="selected_item_bg5">#65E0FF</color>
 
+    <color name="colorGray1">#E6E6E6</color>
+    <color name="colorGray2">#D8D8D8</color>
+    <color name="colorGray3">#585858</color>
+    <color name="colorGray4">#424242</color>
+
+
 
 
 </resources>

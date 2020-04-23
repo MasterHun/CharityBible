@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">CharityBible</string>
+
+    <string-array name="pref_values" >
+        <item>popular</item>
+        <item>top rated</item>
+    </string-array>
+    <string-array name="pref_options" >
+        <item>popular</item>
+        <item>top rated</item>
+    </string-array>
+
 </resources>

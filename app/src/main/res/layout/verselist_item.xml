@@ -13,17 +13,19 @@
 
         <TextView
             android:id="@+id/text_number"
-            android:text="1  "
+            android:text="30"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15dp"/>
+            android:layout_height="match_parent"
+            android:textColor="@color/Black"
+            android:textSize="15sp"/>
 
         <TextView
             android:id="@+id/text_verse"
-            android:text="말씀구절"
+            android:text="또 땅의 모든 짐승과 공중의 모든 날짐승과 속에 생명이 있어 땅에서 기는 모든 것에게는 내가 모든 푸른 채소를 먹을 것으로 주엇노라, 하시니 그대로 되니라."
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="15dp" />
+            android:textColor="@color/Black"
+            android:textSize="15sp" />
 
 
 
