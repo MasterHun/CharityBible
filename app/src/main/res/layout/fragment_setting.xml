@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical">
 
@@ -72,7 +72,7 @@
             android:gravity="center"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:text="역본 기능 사용" />
 
         <LinearLayout
@@ -151,6 +151,7 @@
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
+            android:focusable="true"
             android:orientation="vertical">
 
             <TextView

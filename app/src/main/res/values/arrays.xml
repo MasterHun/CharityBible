@@ -9,6 +9,28 @@
     </string-array>
 
 
+    <string-array name="versions_eng_new">
+        <item>korHKJV</item>
+        <item>없음</item>
+        <item>korNKRV</item>
+        <item>없음</item>
+        <item>korNIV</item>
+        <item>engNIV</item>
+        <item>korNRSV</item>
+        <item>engNRSV</item>
+    </string-array>
+
+    <string-array name="versions_kor_new">
+        <item>킹제임스흠정역 한글(HKJV)</item>
+        <item>없음</item>
+        <item>개역개정판 한글(NKRV)</item>
+        <item>없음</item>
+        <item>새국제판 한글(NIV)</item>
+        <item>새국제판 영어(NIV)</item>
+        <item>신개정표준역 한글(NRSV)</item>
+        <item>신개정표준역 영어(NRSV)</item>
+    </string-array>
+
     <!--
 
     1) 개역한글판(korHRV), 개역개정판(korNKRV), 새번역(korNRSV),

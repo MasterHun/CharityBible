@@ -75,7 +75,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         m_view = inflater.inflate(R.layout.fragment_readbible, container, false);
 
         // 이놈 위치가 너무 애매하다.. 저번에는 여기 두면 에러나던데;;
-        m_RecyclerView = (RecyclerView) m_view.findViewById(R.id.recyclerView);
+        m_RecyclerView = m_view.findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         m_RecyclerView.setLayoutManager(layoutManager);
 
@@ -270,7 +270,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         List<String> dataNumber = new ArrayList<>();
         for(int i=0; i < arrayBible.size(); i++)
         {
-            String strData[] = arrayBible.get(i);
+            String []strData = arrayBible.get(i);
             dataNumber.add(strData[3]+" ");
             dataVerse.add(strData[4]);
         }
@@ -364,8 +364,12 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
         VerseRecyclerViewAdapter.StdViewHolder viewHolder = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(position);
         //Toast.makeText(this, viewHolder.textVerse.getText().toString(), Toast.LENGTH_SHORT).show();
-        String str = viewHolder.textVerse.getText().toString();
+        if( viewHolder != null)
+        {
+            String str = viewHolder.textVerse.getText().toString();
+            Toast.makeText(getActivity(), "짧게 클릭!!:"+str,Toast.LENGTH_SHORT).show();
+        }
 
-        Toast.makeText(getActivity(), "짧게 클릭!!:"+str,Toast.LENGTH_SHORT).show();
+
     }
 }

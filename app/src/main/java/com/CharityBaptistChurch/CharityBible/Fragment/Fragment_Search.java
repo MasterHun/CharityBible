@@ -83,18 +83,24 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
                     m_Adapter = new VerseRecyclerViewAdapter(getContext(), m_list,Fragment_Search.this,Fragment_Search.this);
 
 
-                    List<ArrayList> listseach = SearchText(strText);
+                    List<ArrayList<String>> listseach = SearchText(strText);
                     Log.d("OnCreateVIew","data:"+listseach.get(0).size());
                     if(listseach.get(0).size() > 0)
                     {
                         Log.d("OnCreateVIew","Viewing Search Data"+listseach.get(0).size());
 
+                        // 0 : 성경절 내용
+                        // 1 : 성경절 번호
+                        // 2 : 구약성경에서 카운트 개수
+                        // 3 : 신약성경에서 카운트 개수
+                        m_Adapter.setData( listseach.get(1),listseach.get(0) );
 
-                        m_Adapter.setData(listseach.get(1),listseach.get(0));
-
-                        m_txOldCnt.setText(listseach.get(2).get(0).toString()+"번");
-                        m_txNewCnt.setText(listseach.get(3).get(0).toString()+"번");
-                        m_txTotalCnt.setText(listseach.get(0).size()+"번");
+                        String strOldCnt = listseach.get(2).get(0)+"번";
+                        String strNewCnt = listseach.get(3).get(0)+"번";
+                        String strAllCnt = listseach.get(0).size()+"번";
+                        m_txOldCnt.setText(strOldCnt);
+                        m_txNewCnt.setText(strNewCnt);
+                        m_txTotalCnt.setText(strAllCnt);
                     }else
                     {
                         listseach.get(0).add("  ");
@@ -132,7 +138,7 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
 
     }
 
-    private List<ArrayList> SearchText(String strText) {
+    private List<ArrayList<String>> SearchText(String strText) {
         String strVerse;
         String strTemp;
 
@@ -154,7 +160,7 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
         int nEnd = 0;
 
 
-        List<ArrayList> arrayList = new ArrayList<>();      // 성경 파싱한 정보들이 장 별로 축척된다.
+        List<ArrayList<String>> arrayList = new ArrayList<>();      // 성경 파싱한 정보들이 장 별로 축척된다.
 
 
         ArrayList<String> listVerse = new ArrayList<>();
@@ -172,7 +178,7 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
                 FileReader fr = new FileReader(f);
                 BufferedReader br = new BufferedReader(fr);
 
-                String line = "";
+                String line ;
                 while ((line = br.readLine()) != null) {
                     nStart = 0;
 
@@ -186,7 +192,7 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
 
                     // 1. 구절획득
                     nStart = nEnd + 1;  // +1 을 해줘야 절 index가 된다.
-                    strVerse = line.substring(nStart, line.length());  // 구절을 얻어온다.
+                    strVerse = line.substring(nStart);  // 구절을 얻어온다.
 
                     // 2. 성경과 번호 획득
                     nStart = 0;
@@ -207,7 +213,7 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
 
                     // 4. 절 획득
                     nStart = nEnd + 1;
-                    strVerseNo = strTemp.substring(nStart, strTemp.length()); // 1 을 구해온다.
+                    strVerseNo = strTemp.substring(nStart); // 1 을 구해온다.
 
                     if (Integer.parseInt(strVerseNo) < 10)
                         strVerseNo = "0" + strVerseNo;
@@ -215,7 +221,7 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
                     if (strVerse.indexOf(strText) != -1) {
 
                         listVerse.add(strVerse);
-                        listNumber.add(strBible + " " + strChapter + ":" + strVerseNo);
+                        listNumber.add(strBible + " " + strChapter + ":" + strVerseNo+" ");
 
 
                         if (Integer.parseInt(strBibleNo) < 40) {
