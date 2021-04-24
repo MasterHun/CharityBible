@@ -1,10 +1,19 @@
 package com.CharityBaptistChurch.CharityBible.Fragment;
 
+import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,9 +27,12 @@ import com.CharityBaptistChurch.CharityBible.Adapter.BibleDBAdapter;
 import com.CharityBaptistChurch.CharityBible.Adapter.VerseRecyclerViewAdapter;
 import com.CharityBaptistChurch.CharityBible.BibleReader;
 import com.CharityBaptistChurch.CharityBible.R;
+import com.CharityBaptistChurch.CharityBible.Util;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAdapter.OnListItemLongSelectedInterface, VerseRecyclerViewAdapter.OnListItemSelectedInterface{
@@ -38,9 +50,24 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     private String m_strIsBlackMode;
     private String m_strIsSleepMode;
 
+    private ArrayList<Integer> m_ClickVerse;
+
+    public String getM_strBibleVersion() {
+        return m_strBibleVersion;
+    }
+
+    public String getM_strContexts() {
+        return m_strContexts;
+    }
+
+    public String getM_strChapter() {
+        return m_strChapter;
+    }
 
     BibleDBAdapter dbAdapter;
 
+    Context mContext;
+    Activity mActivity;
 
     public Fragment_ReadBible()
     {
@@ -50,8 +77,20 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mContext = context;
+        if (context instanceof Activity)
+            mActivity = (Activity) context;
+    }
+
+
+    @Override
     public void onStart() {
         super.onStart();
+
+        Log.d("TestLog","ReadBible-onStart");
         Log.d("hun","Fragment_ReadBible::OnStart()");
 
         // 성경이 존재하는지에 대한 체크
@@ -70,6 +109,9 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
 
+        m_ClickVerse = new ArrayList();
+
+        Log.d("TestLog","ReadBible-onCreateView");
         Log.d("hun", "Fragment_ReadBible::onCreateView()");
 
         m_view = inflater.inflate(R.layout.fragment_readbible, container, false);
@@ -78,6 +120,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         m_RecyclerView = m_view.findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         m_RecyclerView.setLayoutManager(layoutManager);
+
 
         // 최근 읽은 성경 DB조회
         getBibleData();
@@ -112,9 +155,10 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
      */
     private void getBibleData()
     {
-        dbAdapter = new BibleDBAdapter(getContext());
-        dbAdapter.open();
-
+        if(dbAdapter == null) {
+            dbAdapter = new BibleDBAdapter(getContext());
+            dbAdapter.open();
+        }
         ArrayList<String> array = dbAdapter.SelectSettingDB();
 
         String strData = array.get(0);
@@ -186,7 +230,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     public boolean isBibleChecker() {
 
         if (getActivity() != null) {
-            String strPath = getActivity().getFilesDir().getAbsolutePath() + File.separator + "Bibles" + File.separator;
+            String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Util.m_strDirectory + File.separator;
             Log.d("hun ", "Fragment_ReadBible::isBibleChecker Path[" + strPath + "]");
             File file = new File(strPath);
             return file.isDirectory();
@@ -228,10 +272,12 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         int nBibleContents = 0;     // 성경 권수 인덱스 구하기 위한 카운트 값
 
         // 3-1. Array에서 구해온 배열을 가지고 성경권의 위치를 찾아낸다.
+        String strBibleContent = "";
         for(int i = 0; i < strBibleContents.length; i ++) {
 
             if( strBibleContents[i].equals(strContents) ) {
                 nBibleContents = i + 1 ;
+                strBibleContent = strBibleContents[i];
                 break;
             }
         }
@@ -247,7 +293,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         // getActivity() 는 Fragment가 Detach 되었을때 에러가 발생될 수 있어서 필터
         String strBiblesPath;
         if(getActivity() != null)
-            strBiblesPath = getActivity().getFilesDir().getAbsolutePath() + File.separator + "Bibles" + File.separator;
+            strBiblesPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Util.m_strDirectory+File.separator;
         else
             return;
 
@@ -268,6 +314,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         // 5. 받은 성경 데이터 정리
         List<String> dataVerse = new ArrayList<>();
         List<String> dataNumber = new ArrayList<>();
+
         for(int i=0; i < arrayBible.size(); i++)
         {
             String []strData = arrayBible.get(i);
@@ -294,17 +341,18 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
         mAdapter.setData(dataNumber,dataVerse);
 
-        // * 2020/02/18 구분선을 추가하면 계속해서 늘어나는현상때문에 우선은 주석처리함
-        // 기본 구분선 추가
-    //    DividerItemDecoration dividerItemDecoration =
-     //           new DividerItemDecoration(m_RecyclerView.getContext(),new LinearLayoutManager(getContext()).getOrientation());
-      //  m_RecyclerView.addItemDecoration(dividerItemDecoration);
-        // 아이템간 공백 추가
-      //  RecyclerDecoration spaceDecoration = new RecyclerDecoration(20);
-      //  mRecyclerView.addItemDecoration(spaceDecoration);
-
         mAdapter.notifyDataSetChanged();
 
+
+        if(dbAdapter == null) {
+            dbAdapter = new BibleDBAdapter(getContext());
+            dbAdapter.open();
+        }
+
+        // 변경된 데이터 디비 업데이트
+        dbAdapter.UpdateSettingChapter(strChapter);
+        dbAdapter.UpdateSettingContents(strContents);
+        getBibleData();
 
     }
 
@@ -313,34 +361,50 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         super.onViewCreated(view, savedInstanceState);
     }
 
-//    public void setVerse()
-//    {
-//     //  VerseListAdapter adapter;
-//      //  adapter = new VerseListAdapter();
-//        //adapter.addItem("1","2","아잉");
-//
-//  //      m_listview.setAdapter(adapter);
-//
-//    }
-
-
     @Override
     public void onItemLongSelected(View v, int position) {
 
-        Toast.makeText(getActivity(), "길게 클릭!!",Toast.LENGTH_SHORT).show();
 
-        VerseRecyclerViewAdapter.StdViewHolder viewHolder = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(position);
-        //Toast.makeText(this, viewHolder.textVerse.getText().toString(), Toast.LENGTH_SHORT).show();
-        String str = viewHolder.textVerse.getText().toString();
+        String str="";
 
-        Toast.makeText(getActivity(), "길게 클릭!!"+str,Toast.LENGTH_SHORT).show();
-//        if(R.id.recyclerView == v.getId())
-//        {
-//            m_RecyclerView.
-//        }
-//
-//        ClipboardManager clipboardManager = (ClipboardManager)getContext().getSystemService(getContext().CLIPBOARD_SERVICE);
-//        ClipData clipData = ClipData.newPlainText("label",);
+        int nSize = m_ClickVerse.size();
+        Collections.sort(m_ClickVerse); /// 오름차순
+
+        if(nSize > 0)
+        {
+            for(int i = 0; i < nSize ; i++)
+            {
+                int nPos = m_ClickVerse.get(i);
+                str = str + m_strBibleVersion + " " + m_strContexts + " " + m_strChapter;
+
+                VerseRecyclerViewAdapter.StdViewHolder viewHolderA = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos);
+                VerseRecyclerViewAdapter.StdViewHolder viewHolderB = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos+1);
+
+                VerseRecyclerViewAdapter.StdViewHolder viewHolderC;
+
+
+
+                int numA = Integer.parseInt( viewHolderA.textNumber.getText().toString().trim() );
+                int numB = Integer.parseInt( viewHolderB.textNumber.getText().toString().trim() );
+
+
+                if( numA == numB )
+                {
+                    str = str +  ":"+numA + "\n";
+                    str += viewHolderA.textVerse.getText().toString() + "\n" + viewHolderB.textVerse.getText().toString();
+                }
+                else if(numA < numB)
+                {
+                    str = str +  ":"+ numA + "\n";
+                    viewHolderC = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos-1);
+                    str += viewHolderC.textVerse.getText().toString() + "\n" + viewHolderA.textVerse.getText().toString();
+                }
+
+                str += "\n";
+
+                i++;
+            }
+        }
 
         Intent msg = new Intent(Intent.ACTION_SEND);
 
@@ -349,6 +413,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         msg.putExtra(Intent.EXTRA_SUBJECT, "주제");
 
         //msg.putExtra(Intent.EXTRA_TEXT, "내용");
+        Log.d("test","[hun]"+str);
         msg.putExtra(Intent.EXTRA_TEXT, str);
 
         msg.putExtra(Intent.EXTRA_TITLE, "제목");
@@ -363,13 +428,106 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     public void onItemSelected(View v, int position) {
 
         VerseRecyclerViewAdapter.StdViewHolder viewHolder = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(position);
-        //Toast.makeText(this, viewHolder.textVerse.getText().toString(), Toast.LENGTH_SHORT).show();
         if( viewHolder != null)
         {
-            String str = viewHolder.textVerse.getText().toString();
-            Toast.makeText(getActivity(), "짧게 클릭!!:"+str,Toast.LENGTH_SHORT).show();
+            int nSize = m_ClickVerse.size();
+            if(nSize > 0) {
+                for (int i = 0; i < nSize; i++) {
+                    if (m_ClickVerse.get(i) == position) {
+                        m_ClickVerse.remove(i);
+                        break;
+                    }
+
+                    if( i + 1 == nSize ) {
+                        m_ClickVerse.add(position);
+                        break;
+                    }
+                }
+            }else
+            {
+                m_ClickVerse.add(position);
+            }
+        }
+    }
+
+    // 권한관련
+    public final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    public final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
+
+    @TargetApi(Build.VERSION_CODES.M)
+    public void checkVerify() {
+        if (
+                ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+        ) {
+            //https://academy.realm.io/kr/posts/android-marshmellow-permission/
+            // 권한 요청 거절 이후의 앱권한 획득 순서
+            // 사용자가 권한 요청을 한번 거절하면 메서든 반환값이 true가 된다.
+            if (ActivityCompat.shouldShowRequestPermissionRationale(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                if(Build.VERSION.SDK_INT>22) {
+                    requestPermissions( new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                }
+
+            } else {
+                if(Build.VERSION.SDK_INT>22) {
+                    // 최초로 권한을 요청하는 경우 ( 첫 실행 )
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                }
+            }
+        } else {
+            // 사용 권한이 있음을 확인한 경우.
         }
 
-
     }
+
+    // 권한관련해서 클릭을 하였을경우 발생되는 콜백함수
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 권한 동의버튼 선택
+                } else {
+                    // 권한 동의안함 버튼 선택
+                    Toast.makeText(getContext(), "동의하지 않으시면 앱을 사용하는데 문제가 발생됩니다.", Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("INSIDEEEEEE");
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        } else {
+            System.out.println("HEREEEEEEEEE");
+        }
+    }
+
 }

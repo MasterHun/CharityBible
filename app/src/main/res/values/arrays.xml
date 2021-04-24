@@ -11,7 +11,7 @@
 
     <string-array name="versions_eng_new">
         <item>korHKJV</item>
-        <item>없음</item>
+        <item>engnkjv</item>
         <item>korNKRV</item>
         <item>없음</item>
         <item>korNIV</item>
@@ -22,7 +22,7 @@
 
     <string-array name="versions_kor_new">
         <item>킹제임스흠정역 한글(HKJV)</item>
-        <item>없음</item>
+        <item>킹제임스흠정역 영어(NKJV)</item>
         <item>개역개정판 한글(NKRV)</item>
         <item>없음</item>
         <item>새국제판 한글(NIV)</item>

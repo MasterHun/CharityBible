@@ -28,17 +28,16 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="5"
-                android:text="본문 글자 크기조절"
+                android:text="글자 크기조절"
                 android:textColor="@color/Black" />
 
-            <SeekBar
+            <android.support.v7.widget.AppCompatSeekBar
                 android:id="@+id/sbtextsize"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="10"
                 android:max="30"
-                android:min="15"
                 android:progress="15" />
 
             <TextView
@@ -48,7 +47,7 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:text="10"
-                android:textSize="20sp" />
+                android:textSize="15sp" />
 
         </LinearLayout>
 
@@ -81,13 +80,14 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:background="?android:attr/selectableItemBackground"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:focusable="true">
 
             <TextView
                 android:id="@+id/tvBible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:text="성경선택"
                 android:textColor="@color/Black"
                 android:textSize="16sp" />
@@ -97,8 +97,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorGray3"
-                android:layout_marginLeft="5dp"
-                android:text="우리말성경 (korHKJV)" />
+                android:layout_marginStart="5sp"
+                android:text="" />
         </LinearLayout>
 
         <View
@@ -185,12 +185,13 @@
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:focusable="true">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:text="성경 삭제"
                 android:textColor="@color/Black"
                 android:textSize="16sp" />
@@ -198,7 +199,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:textColor="@color/colorGray3"
                 android:text="디바이스에 있는 성경을 삭제합니다." />
         </LinearLayout>

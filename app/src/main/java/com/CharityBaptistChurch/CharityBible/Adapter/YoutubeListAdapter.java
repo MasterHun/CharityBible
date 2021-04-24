@@ -1,11 +1,14 @@
 package com.CharityBaptistChurch.CharityBible.Adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.CharityBaptistChurch.CharityBible.R;
 import com.CharityBaptistChurch.CharityBible.Items.YoutubeListViewItem;
@@ -20,11 +23,13 @@ import java.util.HashMap;
 public class YoutubeListAdapter extends BaseAdapter implements YouTubeThumbnailView.OnInitializedListener{
 
 
-    private ArrayList<YoutubeListViewItem> m_list = new ArrayList<YoutubeListViewItem>();
-
+    private OnYotubeItemClick  m_YoutubeCallback;
+    private ArrayList<YoutubeListViewItem> m_list = new ArrayList<>();
     HashMap<View, YouTubeThumbnailLoader> loaders = new HashMap<View,YouTubeThumbnailLoader>();
-    public YoutubeListAdapter(){
+
+    public YoutubeListAdapter(OnYotubeItemClick a_YoutubeCallback){
         super();
+        this.m_YoutubeCallback = a_YoutubeCallback;
     };
     @Override
     public int getCount() {
@@ -54,7 +59,7 @@ public class YoutubeListAdapter extends BaseAdapter implements YouTubeThumbnailV
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
 
         final Context context = parent.getContext();
@@ -66,34 +71,51 @@ public class YoutubeListAdapter extends BaseAdapter implements YouTubeThumbnailV
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+            assert inflater != null;
             view = inflater.inflate(R.layout.youtube_playerview, parent, false);
             holder = new YoutubeViewHolder();
             YouTubeThumbnailView youTubePlayerView = view.findViewById(R.id.item_video);
-            youTubePlayerView = (YouTubeThumbnailView)view.findViewById(R.id.item_video);
             youTubePlayerView .setTag(videoId);
             youTubePlayerView .initialize("AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo",this);
 
-            holder.tvTitle = (TextView)view.findViewById(R.id.tvTitle);
-            holder.tvContext = (TextView)view.findViewById(R.id.tvContext);
+            holder.m_tvTitle = view.findViewById(R.id.tvTitle);
+            holder.m_tvDate = view.findViewById(R.id.tvDate);
+
+            Log.d("mhpark","Youtube A ["+position+"]");
+
+
             view.setTag(holder);
 
         }
         else
         {
+            Log.d("mhpark","Youtube C ["+position+"]");
             holder = (YoutubeViewHolder) view.getTag();
-            YouTubeThumbnailView thumbnail = (YouTubeThumbnailView) view.findViewById(R.id.item_video);
+            YouTubeThumbnailView thumbnail = view.findViewById(R.id.item_video);
             YouTubeThumbnailLoader loader = loaders.get(thumbnail);
             if(loader == null){
                 thumbnail.setTag(videoId);
             }else{
-   //              thumbnail.setImageResource(R.drawable.ic_volume_black_24dp);
+                 thumbnail.setImageResource(R.drawable.ic_volume_black_24dp);
                 loader.setVideo(videoId);
             }
         }
 
+        holder.m_LL_YoutubeItem = view.findViewById(R.id.LL_youtubeitem);
+        holder.m_LL_YoutubeItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YoutubeListViewItem youtubeListViewItem = m_list.get(position);
+
+                m_YoutubeCallback.OnClickItem(youtubeListViewItem.getVideoId());
+                //Log.d("mhpark","Youtube B ["+position+"]"+youtubeListViewItem.getDate());
+            }
+        });
+
         YoutubeListViewItem youtubeListViewItem = m_list.get(position);
-        holder.tvContext.setText(youtubeListViewItem.getContext());
-        holder.tvTitle.setText(youtubeListViewItem.getTitle());
+        //holder.tvContext.setText(youtubeListViewItem.getContext());
+        holder.m_tvTitle.setText(youtubeListViewItem.getTitle());
+        holder.m_tvDate.setText(youtubeListViewItem.getDate());
 
         return view;
     }

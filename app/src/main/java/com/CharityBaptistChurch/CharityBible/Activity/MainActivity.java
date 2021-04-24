@@ -2,14 +2,19 @@ package com.CharityBaptistChurch.CharityBible.Activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.IpSecManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,13 +23,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.CharityBaptistChurch.CharityBible.Adapter.BibleDBAdapter;
@@ -35,212 +42,124 @@ import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_Youtube;
 import com.CharityBaptistChurch.CharityBible.MusicPlayer;
 import com.CharityBaptistChurch.CharityBible.R;
 import com.CharityBaptistChurch.CharityBible.Util;
-import com.gc.materialdesign.views.ButtonFlat;
-import com.gc.materialdesign.views.ButtonFloat;
-import com.gc.materialdesign.views.ButtonRectangle;
 import com.shrikanthravi.customnavigationdrawer2.data.MenuItem;
 import com.shrikanthravi.customnavigationdrawer2.widget.SNavigationDrawer;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 
 public class MainActivity extends AppCompatActivity implements Button.OnClickListener {
 
 
+    // *레이아웃 관련 선언
+    private Button m_Btn_Contents, m_Btn_Chapter, m_Btn_SelectBible;
+    private ImageButton iBtn_Play;
+    private ImageButton m_ImgBtn_Sound;
+    private FloatingActionButton m_FABtn_NextChapter;
+    private FloatingActionButton m_FABtn_PreviousChapter;
 
-    private ImageButton ibtn1_bottom, ibtn2_bottom, ibtn8_bottom;
-    private Button  btn3_bottom, btn4_bottom, btn5_bottom,btn6_bottom,btn7_bottom;
-    private ImageButton ibtn_mp3_top, ibtn_moremenu_top, ibtnPrevious, ibtnPreview, ibtnPlay;
-    private LinearLayout linear_Miniplayer, linear_top;
-    private boolean bMusicbuttonflag;
+    private FrameLayout m_FL_FATBtn;
+    private LinearLayout m_Linear_Miniplayer, m_Linear_top;
 
+    private SeekBar m_SB;
+    private TextView m_TV_PlayTime, m_TV_TotalPlayTime;
+
+    Fragment_ReadBible m_fragmentReadBible;
+
+    private String m_strBibleVersion;           //
+    private String m_strContexts;
+    private String m_strChapter;
+    private String m_strCompareBibleVersion;
+    private String m_strIsReplace;
+    private String m_strFontSize;
+    private String m_strIsBlackMode;
+    private String m_strIsSleepMode;
 
     public BibleDBAdapter dbAdapter;
 
-
-
-    private String m_strContents = "창세기";        // 현재 성경 전서
-    private String m_strChapter = "1";              // 현재 성경 장
-    public String m_strLang = "KOR";               // 현재 성경 언어
-
+    // *변수선언
+    private String m_strContents = "창세기";         // 현재 성경 전서
+   // private String m_strChapter = "1";             // 현재 성경 장
+    private String m_strLang = "KOR";              // 현재 성경 언어
     private int m_nNowMaxChapter = 0;              // 현재 성경전서의 최대장수
     private int m_nNowIndexContents = 0;           // 현재 성경 전서의 인덱스번호
-
-
     static int m_nSelectItem = -1;
+    int m_nFragmentFlag = -1;                      // 현재 띄워진 프래그먼트가 어떤 것인지 확인
+    private boolean m_bSound;                      // 음악 플레이어 사용을 위한 Flag ( True : 보임 / False : 숨김 )
+    private boolean m_bPlay = false;
+    static boolean m_bLoadingImg = false;
 
-    FragmentManager fm;
-    FragmentTransaction tran;
-
-    MusicPlayer mp;
-    boolean bPlayFlge = false;
-
-    int nFragmentFlag = -1;      // 현재 띄워진 프래그먼트가 어떤 것인지 확인
-
-    Fragment_ReadBible fragmentReadBible;
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        Log.i("MainActivity","OnStart()");
-
-        fm = getSupportFragmentManager();
-       tran = fm.beginTransaction();
-
-    }
+    MusicPlayer m_mp;
 
 
-
-
-    public void setBtnContents(String a_strContents) {
-        if(a_strContents.isEmpty())
-            return;
-        btn4_bottom.setText(a_strContents);
-
-        if(dbAdapter != null)
-            dbAdapter.UpdateSettingContents(a_strContents);
-
-    }
-
-    public void setBtnChapter(String a_strChapter) {
-        if(a_strChapter.isEmpty())
-            return;
-        btn5_bottom.setText(a_strChapter+"장");
-
-        if(dbAdapter != null)
-            dbAdapter.UpdateSettingChapter(a_strChapter);
-    }
-
-    public String getBtnContents()
-    {
-        String strContents= btn4_bottom.getText().toString();
-        if( !strContents.isEmpty() )
-            return strContents;
-        return "";
-    }
-
-    public String getBtnChapter()
-    {
-        String strChapter = btn5_bottom.getText().toString();
-        if( !strChapter.isEmpty() )
-            return strChapter;
-        return "";
-    }
-
-    public void setContents(String m_strContents) {
-        this.m_strContents = m_strContents;
-    }
-
-    public void setChapter(String m_strChapter) {
-        this.m_strChapter = m_strChapter;
-    }
-
-    SNavigationDrawer sNavigationDrawer;
-    Class fragmentClass;
-    public static Fragment fragment;
-
-    void TopMenu()
-    {
-        switch(nFragmentFlag) {
-            case 0: {
-
-             //   Toast.makeText(getApplicationContext(),"Read",Toast.LENGTH_SHORT).show();
-                btn3_bottom.setVisibility(View.INVISIBLE);
-                btn7_bottom.setVisibility(View.INVISIBLE);
-
-                linear_top.setVisibility(View.VISIBLE);
-            }
-            break;
-            case 1: {
-              //  Toast.makeText(getApplicationContext(), "Search", Toast.LENGTH_SHORT).show();
-                linear_top.setVisibility(View.GONE);
-                break;
-            }
-            case 2:
-              //  Toast.makeText(getApplicationContext(),"Youtube",Toast.LENGTH_SHORT).show();
-                linear_top.setVisibility(View.GONE);
-                break;
-            case 3:
-             //   Toast.makeText(getApplicationContext(),"Setting",Toast.LENGTH_SHORT).show();
-                linear_top.setVisibility(View.GONE);
-                break;
-            case 4:
-                break;
-            case 5:
-                if(mp != null)
-                {
-                    mp.onPlay();
-
-                    if(bPlayFlge)
-                        ibtnPlay.setImageResource(R.drawable.ic_pause_black_24dp);
-                    else
-                        ibtnPlay.setImageResource(R.drawable.ic_play_arrow_black_24dp);
-                }
-                break;
-        }
-    }
-
-    private Boolean DownloadChecker()
-    {
-        String strPath = getFilesDir().getAbsolutePath()+File.separator+"Bibles";
-
-        File file = new File(strPath);
-
-        File files[] = file.listFiles();
-
-        if(files.length > 0)
-        {
-            return true;
-        }else
-        {
-
-        }
-
-        return false;
-    }
+    /*
+     * @ Func    : onCreate()
+     * @ Param   : ~~~
+     * @ Since   : 2020.06.18
+     * @ Last    : 2020.06.18
+     * @ Author  : mhpark
+     * @ Context : Activity가 떳을때 가장 먼저 호출되는 함수.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("TestLog","MainActivity-OnCreate()");
+        Log.d("MainActivity","OnCreate()");
 
-        DownloadChecker();
+        // *로딩이미지 호출
 
+        if(!m_bLoadingImg) {
+            Intent intent = new Intent(this, LoadingActivity.class);
+            startActivity(intent);
+            m_bLoadingImg = true;
+        }
+        // *액션바 숨기기
         ActionBar actionBar = getSupportActionBar();
-
+        assert actionBar != null;
         actionBar.hide();
+
+        // *권한 체크하기
         checkVerify();
-        Log.i("MainActivity","OnCreate()");
-        //   listviewVerse = (ListView) findViewById(R.id.listview1);
 
-        ibtnPreview = (ImageButton) findViewById(R.id.ibtnPreview);
-        ibtnPreview.setOnClickListener(this);
-        ibtnPrevious = (ImageButton) findViewById(R.id.ibtnPrevious);
-        ibtnPrevious.setOnClickListener(this);
-        ibtnPlay = (ImageButton) findViewById(R.id.ibtnPlay);
-        ibtnPlay.setOnClickListener(this);
+        // *다운로드 체크
+        DownLoadChecker();
 
-        fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        ImageButton iBtn_NextSound = findViewById(R.id.IB_next);        // 다음 음성파일 재생 변수선언
+        iBtn_NextSound.setOnClickListener(this);
 
+        ImageButton iBtn_PreviousSound = findViewById(R.id.IB_previous);   // 이전 음성파일 재생 변수선언
+        iBtn_PreviousSound.setOnClickListener(this);
+
+        iBtn_Play = findViewById(R.id.IB_play);
+        iBtn_Play.setOnClickListener(this);
+
+        m_fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+
+        //*sNavigationDrawer 선언 및 사
         sNavigationDrawer = findViewById(R.id.navigationDrawer);
         List<MenuItem> menuItems = new ArrayList<>();
         menuItems.add(new MenuItem("성경읽기(Read)",R.drawable.news_bg));
         menuItems.add(new MenuItem("구절검색(Search)",R.drawable.feed_bg));
         menuItems.add(new MenuItem("유튜브(Youtube)",R.drawable.message_bg));
         menuItems.add(new MenuItem("설정(Setting)",R.drawable.music_bg));
+        //menuItems.add(new MenuItem("설정(Setting)",R.drawable.music_bg));
         sNavigationDrawer.setMenuItemList(menuItems);
         sNavigationDrawer.setAppbarTitleTV("성경읽기(Read)");
-        //sNavigationDrawer.setAppbarTitleTextColor(R.color.colorRed);
 
         fragmentClass =  Fragment_ReadBible.class;
         try {
@@ -261,30 +180,30 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
                 switch (position){
                     case 0:{
-                     //   color1 = R.color.red;
+                        //   color1 = R.color.red;
                         fragmentClass = Fragment_ReadBible.class;
-                        nFragmentFlag = 0;
+                        m_nFragmentFlag = 0;
                         TopMenu();
                         break;
                     }
                     case 1:{
-                    //    color1 = R.color.orange;
+                        //    color1 = R.color.orange;
                         fragmentClass = Fragment_Search.class;
-                        nFragmentFlag = 1;
+                        m_nFragmentFlag = 1;
                         TopMenu();
                         break;
                     }
                     case 2:{
-                       // color1 = R.color.green;
+                        // color1 = R.color.green;
                         fragmentClass = Fragment_Youtube.class;
-                        nFragmentFlag = 2;
+                        m_nFragmentFlag = 2;
                         TopMenu();
                         break;
                     }
                     case 3:{
-                      //  color1 = R.color.blue;
+                        //  color1 = R.color.blue;
                         fragmentClass = Fragment_Setting.class;
-                        nFragmentFlag = 3;
+                        m_nFragmentFlag = 3;
                         TopMenu();
                         break;
                     }
@@ -332,89 +251,256 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             }
         });
 
-
-
         /////////////
-        linear_Miniplayer = (LinearLayout) findViewById(R.id.lineaMiniplayer);
-        bMusicbuttonflag = false;
 
-        linear_top = (LinearLayout) findViewById(R.id.lineartop);
-
+        m_Linear_top = findViewById(R.id.LL_Top);
+        m_FL_FATBtn = findViewById(R.id.FL_FatButton);
 
         // *이전 페이지
-        ibtn1_bottom = (ImageButton) findViewById(R.id.btn1_bottom);
-        ibtn1_bottom.setOnClickListener(this);
+        m_FABtn_PreviousChapter = findViewById(R.id.FAT_Previous);   // Variable
+        m_FABtn_PreviousChapter.setOnClickListener(this);
 
         // *다음 페이지
-        ibtn2_bottom = (ImageButton) findViewById(R.id.btn2_bottom);
-        ibtn2_bottom.setOnClickListener(this);
-
-        //
-        btn3_bottom = (Button) findViewById(R.id.btn3_bottom);
-        btn3_bottom.setOnClickListener(this);
-        btn3_bottom.setVisibility(View.INVISIBLE);
+        m_FABtn_NextChapter = findViewById(R.id.FAT_Next);           // Variable
+        m_FABtn_NextChapter.setOnClickListener(this);
 
         // *성경전서
-        btn4_bottom = (Button)  findViewById(R.id.btn4_bottom);
-        btn4_bottom.setOnClickListener(this);
+        m_Btn_Contents = findViewById(R.id.BTN_contents);
+
+        m_Btn_Contents.setOnClickListener(this);
 
         // *성경장수
-        btn5_bottom = (Button) findViewById(R.id.btn5_bottom);
-        btn5_bottom.setOnClickListener(this);
+        m_Btn_Chapter = findViewById(R.id.BTN_chapter);
+        m_Btn_Chapter.setOnClickListener(this);
 
         // *성경종류
-        btn6_bottom = (Button) findViewById(R.id.btn6_bottom);
-        btn6_bottom.setOnClickListener(this);
-
-        //
-        btn7_bottom = (Button) findViewById(R.id.btn7_bottom);
-        btn7_bottom.setOnClickListener(this);
-        btn7_bottom.setVisibility(View.INVISIBLE);
+        m_Btn_SelectBible = findViewById(R.id.BTN_selectbible);
+        m_Btn_SelectBible.setOnClickListener(this);
 
         // *음성파일 재생
-        ibtn8_bottom = (ImageButton) findViewById(R.id.btn8_bottom);
-        ibtn8_bottom.setOnClickListener(this);
+        m_ImgBtn_Sound = findViewById(R.id.IB_sound);
+        m_ImgBtn_Sound.setOnClickListener(this);
 
         // *미니플레이어를 숨김
-        bMusicbuttonflag = false;
-        linear_Miniplayer.setVisibility(View.INVISIBLE);
+        m_Linear_Miniplayer = findViewById(R.id.lineaMiniplayer);
+        m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
+        m_bSound = false;
+
+        m_TV_PlayTime = findViewById(R.id.TV_playtime);
+        m_TV_PlayTime.setText("00:00");
+
+        m_TV_TotalPlayTime = findViewById(R.id.TV_totalplaytime);
+        m_TV_TotalPlayTime.setText("00:00");
+
+        // 재생
+        m_SB = findViewById(R.id.SB_playbar);
+        m_SB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            // 드래그 하는 중에 발생됨
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser){
+                    m_mp.setSeekto(progress);
+                }
+
+                int m = progress / 60000;
+                int s = (progress % 60000) / 1000;
+                String strTime = String.format("%02d:%02d",m,s);
+                m_TV_PlayTime.setText(strTime);
+
+            }
+            // 최초 탭하고 드래그 시작할때
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            // 드래그 멈출
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
 
 
         dbAdapter = new BibleDBAdapter(this);
         dbAdapter.open();
 
+        ArrayList<String> array = dbAdapter.SelectSettingDB();
+        if( 0 == array.size())
+        {
+            dbAdapter.InsertSetting_DB("창세기", "01", "Y", "korHKJV",
+                    "engnkjv", "15", "Y", "Y");
+            dbAdapter.InsertUnderline_DB("창세기", "01", "20");
+        }
+
         init();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d("TestLog","MainActivity-onStart");
+        Log.d("MainActivity","OnStart()");
+
+    //    fm = getSupportFragmentManager();
+     //   fragtran = fm.beginTransaction();
+     //   fragtran.commit();
 
     }
+
+
+
+
+    public void setBtnContents(String a_strContents) {
+        if(a_strContents.isEmpty())
+            return;
+        m_Btn_Contents.setText(a_strContents);
+
+        if(dbAdapter != null)
+            dbAdapter.UpdateSettingContents(a_strContents);
+
+    }
+
+    public void setBtnChapter(String a_strChapter) {
+        if(a_strChapter.isEmpty())
+            return;
+        m_Btn_Chapter.setText(a_strChapter+"장");
+
+        if(dbAdapter != null)
+            dbAdapter.UpdateSettingChapter(a_strChapter);
+    }
+
+    public String getBtnContents()
+    {
+        String strContents = m_Btn_Contents.getText().toString();
+        if( !strContents.isEmpty() )
+            return strContents;
+        return "";
+    }
+
+    public String getBtnChapter()
+    {
+        String strChapter = m_Btn_Chapter.getText().toString();
+        if( !strChapter.isEmpty() )
+            return strChapter;
+        return "";
+    }
+
+    public void setContents(String m_strContents) {
+        this.m_strContents = m_strContents;
+    }
+
+    public void setChapter(String m_strChapter) {
+        this.m_strChapter = m_strChapter;
+    }
+
+    SNavigationDrawer sNavigationDrawer;
+    Class fragmentClass;
+    public static Fragment fragment;
+
+
+    /*
+     * @ Func    : TopMenu()
+     * @ Param   : x
+     * @ Since   : 2020.06.07
+     * @ Last    : 2020.06.07
+     * @ Author  : mhpark
+     * @ Context : 상단 네이게이션바에 있는 오브젝트들 보여줄 것들 필터하는 함수.
+     */
+    void TopMenu()
+    {
+        switch(m_nFragmentFlag) {
+            case 0: {
+                m_Linear_top.setVisibility(View.VISIBLE);
+                m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
+                m_FL_FATBtn.setVisibility(View.VISIBLE);
+            }
+            break;
+            case 1: {
+                m_Linear_top.setVisibility(View.GONE);
+                m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
+                m_FL_FATBtn.setVisibility(View.INVISIBLE);
+                break;
+            }
+            case 2:
+            case 3:
+            case 4:
+                m_Linear_top.setVisibility(View.GONE);
+                m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
+                m_FL_FATBtn.setVisibility(View.INVISIBLE);
+                break;
+
+            //            case 5:
+//                if(mp_sound != null)
+//                {
+//                    mp_sound.onPlay();
+//
+//                    if(bPlay)
+//                        iBtn_Play.setImageResource(R.drawable.ic_pause_black_24dp);
+//                    else
+//                        iBtn_Play.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+//                }
+//                break;
+        }
+    }
+
+    private Boolean DownloadChecker()
+    {
+        //String strPath = getFilesDir().getAbsolutePath()+File.separator+"Downloads"+File.separator;
+        String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Util.m_strDirectory+File.separator;
+        File file = new File(strPath);
+
+        if(!file.exists()) {
+            return file.mkdirs();
+        }
+
+        if(file.isDirectory())
+        {
+            Log.d("DownloadChecker","폴더가 존재한다.");
+        }else
+        {
+            Log.d("DownloadChecker","폴더가 없음");
+       }
+
+        File[] files = file.listFiles();
+
+        if(files == null)
+            return false;
+
+        return files.length > 0;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
+        Log.d("TestLog","MainActivity-OnResume()");
 
         String strChapter;
         String strContents;
         int nChapter = 0;
 
-        Log.i("MainActivity","OnResume()");
+        Log.d("MainActivity","OnResume()");
 
 
         Intent intent = getIntent();
         if( intent.getExtras() != null ) {
-            Log.i("MainActivity","intent 값받아옴");
+            Log.d("MainActivity","intent 값받아옴");
             strChapter = intent.getStringExtra("Chapter");      // 성경 장
             strContents = intent.getStringExtra("Contents");     // 성경 전서
-            Log.i("MainActivity",strContents+":"+strChapter);
+            Log.d("MainActivity",strContents+":"+strChapter);
 
-            if(!strChapter.isEmpty()) {
+            if( strChapter != null) {
                 nChapter = Integer.parseInt(strChapter);
             }
 
             if( nChapter > 0)
             {
                 m_strChapter = strChapter;
-                Log.i("MainActivity","찍힘 Here");
+                Log.d("MainActivity","찍힘 Here");
                 Toast.makeText(getApplicationContext(), strContents,Toast.LENGTH_SHORT).show();
             }
 
@@ -423,8 +509,9 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                 m_strContents = strContents;
             }
 
-            fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-            fragmentReadBible.init(m_strContents,m_strChapter);
+            m_fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+            assert m_fragmentReadBible != null;
+            m_fragmentReadBible.init(m_strContents,m_strChapter);
             setBtnContents(m_strContents);
             setBtnChapter(m_strChapter);
             init();
@@ -441,19 +528,25 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i("MainActivity","OnPause()");
+        Log.d("TestLog","MainActivity-OnPause()");
+        Log.d("MainActivity","OnPause()");
     }
 
     // *성경 전서 인덱스, 성경 장수 값들 초기화
     private void init()
     {
+
+
+        // 다운로드된 파일이 있는지 체크
+        DownloadChecker();
+
         String[] strBibleContents = getResources().getStringArray(R.array.KOR);
         String[] strBibleMaxLen = getResources().getStringArray(R.array.KOR_LEN);
 
         for(int i = 0; i < strBibleContents.length; i ++) {
 
             // 현재 성경전서과 같은 인데스 위치 찾음
-            if( true == strBibleContents[i].equals(m_strContents) ) {
+            if(strBibleContents[i].equals(m_strContents)) {
                 m_nNowIndexContents = i;
                 m_nNowMaxChapter = Integer.parseInt(strBibleMaxLen[i]);
                 break;
@@ -468,6 +561,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         switch (resultCode)
         {
             case 1:
+                assert data != null;
                 String key = data.getStringExtra("key");
                 break;
             case 2:
@@ -476,18 +570,19 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
     }
 
+
     @Override
     public void onClick(View v) {
 
-        fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
+        m_fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         int nChapter = Integer.parseInt(m_strChapter);
         switch (v.getId())
         {
 
-            case R.id.btn1_bottom:  // *이전 장
+            case R.id.FAT_Previous:  // *이전 장
                 if(nChapter > 1) {
                     m_strChapter = Integer.toString(nChapter - 1);
-                    fragmentReadBible.init(m_strContents, m_strChapter);
+                    m_fragmentReadBible.init(m_strContents, m_strChapter);
                     init();
                     setBtnContents(m_strContents);
                     setBtnChapter(m_strChapter);
@@ -501,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                         m_strContents = strBibleContents[m_nNowIndexContents];
                         init();
                         m_strChapter = Integer.toString(m_nNowMaxChapter);
-                        fragmentReadBible.init(m_strContents, m_strChapter);
+                        m_fragmentReadBible.init(m_strContents, m_strChapter);
 
                         setBtnContents(m_strContents);
                         setBtnChapter(m_strChapter);
@@ -510,17 +605,18 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                         Toast.makeText(getApplicationContext(),"첫 장입니다.",Toast.LENGTH_SHORT).show();
                     }
                 }
-                getBibleList();
+                //getBibleList();
                 break;
-            case R.id.btn2_bottom:  // *다음 장
+            case R.id.FAT_Next:  // *다음 장
 
                 if(nChapter < m_nNowMaxChapter) {
                     m_strChapter = Integer.toString(nChapter + 1);
-                    fragmentReadBible.init(m_strContents, m_strChapter);
+                    m_fragmentReadBible.init(m_strContents, m_strChapter);
 
                     init();
                     setBtnContents(m_strContents);
                     setBtnChapter(m_strChapter);
+
                 }else
                 {
                     // 다음 성경전서 찾기
@@ -530,7 +626,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                         m_strContents = strBibleContents[m_nNowIndexContents];
                         m_strChapter = "1";
 
-                        fragmentReadBible.init(m_strContents, m_strChapter);
+                        m_fragmentReadBible.init(m_strContents, m_strChapter);
                         init();
                         setBtnContents(m_strContents);
                         setBtnChapter(m_strChapter);
@@ -543,11 +639,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
 
                 break;
-            case R.id.btn3_bottom:
-
-                break;
-                //setFrag(2);
-            case R.id.btn4_bottom: // *성경 전서
+            case R.id.BTN_contents: // *성경 전서
 
                 Intent it_1 = new Intent(getApplicationContext(), BibleTabActivity.class);
                 startActivity(it_1);
@@ -556,10 +648,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
                 //setFrag(3);
                 break;
-            case R.id.btn5_bottom:  // *성경 장
+            case R.id.BTN_chapter:  // *성경 장
 
                 Intent it_2 = new Intent(getApplicationContext(), ChapterTableActivity.class);
-                String strBible = "";
+                String strBible;
                 int nBiblePosition = findBiblePosition(m_strContents, "KOR");
                 final String[] bible = getResources().getStringArray(R.array.KOR);
                 strBible = bible[nBiblePosition];
@@ -573,7 +665,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                 //setFrag(4);
                 break;
 
-            case R.id.btn6_bottom:
+            case R.id.BTN_selectbible:
 
 
                 final CharSequence[] oItemsA = { "킹제임스 흠정역(HKJV)", "개역개정(NKRV)","쉬운성경(Easy)" };
@@ -594,7 +686,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     public void onClick(DialogInterface dialog, int which) {
 
                         if(m_nSelectItem > 0)
-                            btn6_bottom.setText(oItemsB[m_nSelectItem]);
+                            m_Btn_SelectBible.setText(oItemsB[m_nSelectItem]);
                     }
                 }).setCancelable(false).show();
 
@@ -602,81 +694,118 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                 break;
 
 
-            case R.id.btn8_bottom:
-                if(bMusicbuttonflag) {
-                    linear_Miniplayer.setVisibility(View.INVISIBLE);
-                    bMusicbuttonflag = false;
-                }
-                else {
-                    linear_Miniplayer.setVisibility(View.VISIBLE);
-                    bMusicbuttonflag = true;
-                }
-                break;
+            case R.id.IB_sound:
 
-//            case R.id.btn1_top:
-//                Intent it_1 = new Intent(getApplicationContext(), BibleTabActivity.class);
-//                startActivity(it_1);
-//                break;
-//            case R.id.btn2_top:
-//                Intent it_2 = new Intent(getApplicationContext(), ChapterTableActivity.class);
-//
-//
-//                String strBible = "";
-//                int nBiblePosition = findBiblePosition(m_strContents, "KOR");
-//                final String[] bible = getResources().getStringArray(R.array.KOR);
-//                strBible = bible[nBiblePosition];
-//                nBiblePosition =  Util.numOfChapters[nBiblePosition];
-//
-//                it_2.putExtra("bookPosition", nBiblePosition);
-//                it_2.putExtra("bookName", strBible);
-//
-//                startActivity(it_2);
-//                break;
-//            case R.id.ibtn_mp3_top:
-//                if(bMusicbuttonflag) {
-//                    linear_Miniplayer.setVisibility(View.INVISIBLE);
-//                    bMusicbuttonflag = false;
-//
-//
-//                }
-//                else {
-//                    linear_Miniplayer.setVisibility(View.VISIBLE);
-//                    bMusicbuttonflag = true;
-//
-//                    File file = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-//                    String strDir = file.getAbsolutePath();
-//
-//                    String strPath  = strDir + "/bible_mp3";
-//                    mp = new MusicPlayer(strPath);
-//                    mp.initMusic();
-//                }
-//                break;
-            case R.id.ibtnPreview:
-                if(mp != null)
-                {
-                    mp.onPreview();
-                }
-                break;
-            case R.id.ibtnPlay:
-                if(mp != null)
-                {
-                    mp.onPlay();
+                if(m_bSound) {    // 사운드 버튼 Off
 
-                    if(bPlayFlge)
-                        ibtnPlay.setImageResource(R.drawable.ic_pause_black_24dp);
-                    else
-                        ibtnPlay.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                    m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
+                    m_bSound = false;
+
+                    m_ImgBtn_Sound.setSelected(false);
+
+                    m_FABtn_NextChapter.animate().translationY(0).start();
+                    m_FABtn_PreviousChapter.animate().translationY(0).start();
+
+                    if(m_mp != null) {
+                        m_mp.clearMediaPlayer();
+                        m_mp = null;
+                    }
+                }
+                else {          // 사운드 버튼 On
+                    m_Linear_Miniplayer.setVisibility(View.VISIBLE);
+                    m_bSound = true;
+
+                    m_ImgBtn_Sound.setSelected(true);
+
+                    m_FABtn_NextChapter.animate().translationY(-180).start();
+                    m_FABtn_PreviousChapter.animate().translationY(-180).start();
+
+                    String strSoundPath = Environment.getExternalStorageDirectory()+File.separator+Util.m_strDirectory+File.separator+"BibleSound";
+                    if(m_mp == null) {
+                        m_mp = new MusicPlayer(strSoundPath);
+                        m_mp.initMusic(
+                                m_fragmentReadBible.getM_strBibleVersion(),
+                                m_fragmentReadBible.getM_strContexts(),
+                                Integer.parseInt(m_fragmentReadBible.getM_strChapter()) );
+                    }
                 }
                 break;
-            case R.id.ibtnPrevious:
-                if(mp != null)
+            case R.id.IB_next:
+                if(m_mp != null)
                 {
-                    mp.onPrevious();
+                    m_mp.onPreview();
+                    m_SB.setMax(m_mp.getDuration());
+
+                    int nData = m_mp.getDuration();
+                    int m = nData / 60000;
+                    int s = (nData % 60000) / 1000;
+                    String strTime = String.format("%02d:%02d",m,s);
+                    m_TV_TotalPlayTime.setText(strTime);
+                }
+                break;
+            case R.id.IB_play:
+                if(m_mp != null)
+                {
+                    m_bPlay = !m_bPlay;
+
+                    if(m_bPlay) { // 재생중일때
+                        iBtn_Play.setImageResource(R.drawable.ic_pause_black_24dp);
+                        m_mp.onPlay();
+                        m_SB.setMax(m_mp.getDuration());
+
+                        int nData = m_mp.getDuration();
+                        int m = nData / 60000;
+                        int s = (nData % 60000) / 1000;
+                        String strTime = String.format("%02d:%02d",m,s);
+                        m_TV_TotalPlayTime.setText(strTime);
+
+                        Thread();
+                    }
+                    else { // 재생중 아닐때
+                        iBtn_Play.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                        m_mp.onPause();
+                    }
+                }
+                break;
+            case R.id.IB_previous:
+                if(m_mp != null)
+                {
+                    m_mp.onPrevious();
+                    m_SB.setMax(m_mp.getDuration());
+
+                    int nData = m_mp.getDuration();
+                    int m = nData / 60000;
+                    int s = (nData % 60000) / 1000;
+                    String strTime = String.format("%02d:%02d",m,s);
+                    m_TV_TotalPlayTime.setText(strTime);
                 }
                 break;
 
         }
 
+    }
+
+    public void Thread(){
+        Runnable task = new Runnable(){
+            @Override
+            public void run() {
+
+                while(m_mp.IsPlaying())
+                {
+                    try{
+                        Thread.sleep(1000);
+                    }catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    m_SB.setProgress(m_mp.getCurrentPosition());
+                }
+
+            }
+        };
+
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     // @@Function
@@ -719,11 +848,13 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         ArrayList<String> arrayList = new ArrayList<>();
 
-        String strPath = getFilesDir().getAbsolutePath() + File.separator + "Bibles" + File.separator;
+        //String strPath = getFilesDir().getAbsolutePath() + File.separator + "Bibles" + File.separator;
+        String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Util.m_strDirectory+File.separator;
         Log.d("hun ", "MainActivity::getBibleList Path[" + strPath + "]");
         File file = new File(strPath);
-        File filelist[] = file.listFiles();
+        File[] filelist = file.listFiles();
 
+        assert filelist != null;
         for(int i = 0; i < filelist.length; i++)
         {
             if( filelist[i].getName().indexOf(".cbk") > 0 )
@@ -756,11 +887,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
                     zip.close();
 
-                }
-                catch (ZipException e)
-                {
-                    e.printStackTrace();
-                }catch (IOException e)
+                } catch (IOException e)
                 {
                     e.printStackTrace();
                 }
@@ -769,58 +896,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         }
 
         return arrayList;
-
-    }
-
-
-
-    public void setFrag(int n){
-        fm = getSupportFragmentManager();
-        tran = fm.beginTransaction();
-
-        Animation animation;
-
-//        switch(n) {
-//            case 0:     // *성경읽기
-//                tran.replace(R.id.fragment, frag_readbible);
-//                tran.commit();
-//                actionBar.show();
-//                break;
-//            case 1:
-//                animation= new AlphaAnimation(1,0);
-//                animation.setDuration(1000);
-//                tran.replace(R.id.fragment, frag_search);
-//                tran.commit();
-//                actionBar.hide();
-
-//                btn1_top.setVisibility(View.INVISIBLE);
-//                btn2_top.setVisibility(View.INVISIBLE);
-//                btn3_top.setVisibility(View.INVISIBLE);
-//                imgbtn_moremenu_top.setVisibility(View.INVISIBLE);
-//                imgbtn_mp3_top.setVisibility(View.INVISIBLE);
-//
-//                btn1_top.setAnimation(animation);
-//                btn2_top.setAnimation(animation);
-//                btn3_top.setAnimation(animation);
-
-//                break;
-//            case 2:
-//                //tran.replace(R.id.fragment, frag_readbible);
-//                //tran.commit();
-//                Toast.makeText(getApplicationContext(),"준비중인 기능입니다.",Toast.LENGTH_SHORT).show();
-//                break;
-//            case 3:
-//                tran.replace(R.id.fragment, frag_youtube);
-//                tran.commit();
-//                actionBar.hide();
-//                break;
-//            case 4:
-//                tran.replace(R.id.fragment, frag_setting);
-//                tran.commit();
-//                actionBar.hide();
-//                break;
-
-       // }
 
     }
 
@@ -868,8 +943,120 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     Toast.makeText(this, "동의하지 않으시면 앱을 사용하는데 문제가 발생됩니다.", Toast.LENGTH_LONG).show();
                     finish();
                 }
-                return;
             }
+        }
+    }
+
+
+    private void DownLoadChecker()
+    {
+        ArrayList<String> arrayBible = getBibleList();
+        if(arrayBible.size() == 0) {
+
+                //String url = "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fk.kakaocdn.net%2Fdn%2Fb4LL01%2Fbtqv809t5X9%2FVY5qybXsG3TKsXbIiSD1KK%2Fimg.jpg";
+            DownloadFileAsync df = new DownloadFileAsync(this);
+            df.execute("","1","1");
+        }
+    }
+
+    static class DownloadFileAsync extends AsyncTask<String, String, String> {
+
+        private ProgressDialog mDlg;
+        private Context mContext;
+
+        public DownloadFileAsync(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mDlg = new ProgressDialog(mContext);
+            mDlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mDlg.setMessage("Start");
+            mDlg.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            int count = 0;
+
+            try {
+
+
+                ArrayList<String> array = new ArrayList<>();
+                array.add("http://175.198.115.173:8000/FileDownload/engnkjv.cbk");
+                array.add("http://175.198.115.173:8000/FileDownload/korHKJV.cbk");
+                array.add("http://175.198.115.173:8000/FileDownload/kornkrv.cbk");
+
+                for(int i = 0; i < array.size(); i++) {
+                    publishProgress("max", "100");
+                    Thread.sleep(100);
+                    URL url = new URL(array.get(i));
+                    URLConnection conexion = url.openConnection();
+                    conexion.connect();
+
+                    int lenghtOfFile = conexion.getContentLength();
+                    Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
+
+                    int nIndex = array.get(i).indexOf(".cbk");
+                    nIndex = array.get(i).lastIndexOf("/", nIndex);
+                    String strName = array.get(i).substring(nIndex+1);
+
+                    String strPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + Util.m_strDirectory + File.separator + strName;
+                    InputStream input = new BufferedInputStream(url.openStream());
+                    OutputStream output = new FileOutputStream(strPath);
+
+                    byte[] data = new byte[1024];
+
+                    long total = 0;
+
+                    while ((count = input.read(data)) != -1) {
+                        total += count;
+                        //publishProgress("" + (int) ((total * 100) / lenghtOfFile));
+                        publishProgress("progress", "" + (int) ((total * 100) / lenghtOfFile), "테스트중");
+                        output.write(data, 0, count);
+                    }
+
+                    output.flush();
+                    output.close();
+                    input.close();
+                }
+
+                // 작업이 진행되면서 호출하며 화면의 업그레이드를 담당하게 된다
+                //publishProgress("progress", 1, "Task " + 1 + " number");
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+
+            // 수행이 끝나고 리턴하는 값은 다음에 수행될 onProgressUpdate 의 파라미터가 된다
+            return null;
+        }
+
+
+        @Override
+        protected void onProgressUpdate(String... progress) {
+            if (progress[0].equals("progress")) {
+                mDlg.setProgress(Integer.parseInt(progress[1]));
+                mDlg.setMessage(progress[2]);
+            } else if (progress[0].equals("max")) {
+                mDlg.setMax(Integer.parseInt(progress[1])); // 최대값
+            }
+        }
+
+        @SuppressWarnings("deprecation")
+        @Override
+        protected void onPostExecute(String unused) {
+            mDlg.dismiss();
+            //Toast.makeText(mContext, Integer.toString(result) + " total sum",
+            //Toast.LENGTH_SHORT).show();
         }
     }
 

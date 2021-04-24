@@ -29,12 +29,12 @@ public class VerseRecyclerViewAdapter_Setting extends RecyclerView.Adapter<Verse
 
     private SparseBooleanArray mSelectedItems = new SparseBooleanArray(0);
 
-    Context mContext;
-    List<String> mdataVerse, mdataNumber;
-    RecyclerView recyclerView;
-    int mFontSize = 15;
+    private Context mContext;
+    private List<String> mdataVerse, mdataNumber;
+    private RecyclerView recyclerView;
+    private int mFontSize = 15;
 
-    boolean m_bCompare = false;             // true:성경비교x/false:성경비교o
+    private boolean m_bCompare = false;             // true:성경비교x/false:성경비교o
 
     public VerseRecyclerViewAdapter_Setting(Context context
             , RecyclerView recyclerView
@@ -56,7 +56,7 @@ public class VerseRecyclerViewAdapter_Setting extends RecyclerView.Adapter<Verse
 
 
     public void setData(List<String> dataNumber, List<String> dataVerse) {
-        Log.i("Verse_Adapter","setData");
+        Log.d("Verse_Adapter","setData");
         mdataVerse = dataVerse;
         mdataNumber = dataNumber;
 
@@ -73,7 +73,7 @@ public class VerseRecyclerViewAdapter_Setting extends RecyclerView.Adapter<Verse
     @NonNull
     @Override
     public StdViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.i("Verse_Adapter","OnCreateViewHolder");
+        Log.d("Verse_Adapter","OnCreateViewHolder");
         LayoutInflater inflate = LayoutInflater.from(mContext);
         View view = inflate.inflate(R.layout.verselist_item, parent, false);
 
@@ -85,13 +85,13 @@ public class VerseRecyclerViewAdapter_Setting extends RecyclerView.Adapter<Verse
 
     @Override
     public int getItemCount() {
-        Log.i("Verse_Adapter","getItemCount");
+        Log.d("Verse_Adapter","getItemCount");
         return mdataVerse.size();
     }
 
     @Override
     public void onBindViewHolder(@NonNull StdViewHolder holder, int position) {
-        Log.i("Verse_Adapter","OnBindViewHolder");
+        Log.d("Verse_Adapter","OnBindViewHolder");
 
         holder.textNumber.setTextSize(mFontSize);
         holder.textVerse.setTextSize(mFontSize);
@@ -126,8 +126,8 @@ public class VerseRecyclerViewAdapter_Setting extends RecyclerView.Adapter<Verse
     }
 
     private void toggleItemSelected(int position) {
-        Log.i("Verse_Adapter","toggleItemSelected");
-        if (mSelectedItems.get(position, false) == true) {
+        Log.d("Verse_Adapter","toggleItemSelected");
+        if (mSelectedItems.get(position, false)) {
             mSelectedItems.delete(position);
             notifyItemChanged(position);
         } else {
@@ -140,17 +140,17 @@ public class VerseRecyclerViewAdapter_Setting extends RecyclerView.Adapter<Verse
         return mSelectedItems.get(position, false);
     }
 
-    public class StdViewHolder extends RecyclerView.ViewHolder {
-        public TextView textVerse;
-        public TextView textNumber;
+    static class StdViewHolder extends RecyclerView.ViewHolder {
+        TextView textVerse;
+        TextView textNumber;
 
-        public StdViewHolder(@NonNull View itemView) {
+        StdViewHolder(@NonNull View itemView) {
 
             super(itemView);
             this.textVerse= itemView.findViewById(R.id.text_verse);
             this.textNumber= itemView.findViewById(R.id.text_number);
 
-            Log.i("Verse_Adapter","StdViewHolder");
+            Log.d("Verse_Adapter","StdViewHolder");
         }
     }
 

@@ -32,13 +32,12 @@
                 <!--android:textSize="10sp"/>-->
 
             <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="wrap_content"
                 android:layout_height="60dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_centerInParent="true">
 
-                <Button
+                <android.widget.Button
                     android:id="@+id/list_testament"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -46,11 +45,10 @@
                     android:gravity="center"
                     android:textStyle="bold"
                     android:text="목록보기"
-                    android:textColor="@android:color/holo_red_light"
-                    android:background="@color/colorPrimaryDark"
+                    android:background="@drawable/buttonshape"
                     android:textSize="20sp"/>
 
-                <Button
+                <android.widget.Button
                     android:id="@+id/simple_testament"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -58,8 +56,7 @@
                     android:gravity="center"
                     android:textStyle="bold"
                     android:text="간략보기"
-                    android:textColor="@android:color/holo_red_light"
-                    android:background="@color/colorPrimaryDark"
+                    android:background="@drawable/buttonshape"
                     android:textSize="20sp"
                     />
 
@@ -86,14 +83,14 @@
                 android:drawSelectorOnTop="false"
                 android:fadingEdge="none"/>
 
-            <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            <ScrollView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:scrollbars="vertical">
-                <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                <TableLayout
                     android:id="@+id/table"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent">
+                    android:layout_height="wrap_content">
                 </TableLayout>
             </ScrollView>
         </ViewFlipper>

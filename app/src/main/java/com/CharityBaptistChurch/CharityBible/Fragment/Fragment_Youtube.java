@@ -1,31 +1,34 @@
 package com.CharityBaptistChurch.CharityBible.Fragment;
 
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.CharityBaptistChurch.CharityBible.Activity.MainActivity;
+import com.CharityBaptistChurch.CharityBible.Adapter.OnYotubeItemClick;
 import com.CharityBaptistChurch.CharityBible.Adapter.YoutubeListAdapter;
 import com.CharityBaptistChurch.CharityBible.R;
+import com.gc.materialdesign.widgets.Dialog;
 import com.gc.materialdesign.widgets.ProgressDialog;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 import com.google.android.youtube.player.YouTubePlayerView;
-import com.google.android.youtube.player.YouTubeThumbnailLoader;
-import com.google.android.youtube.player.YouTubeThumbnailView;
-import com.willowtreeapps.spruce.Spruce;
-import com.willowtreeapps.spruce.animation.DefaultAnimations;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,36 +38,34 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
-import java.util.TimerTask;
 
 
-public class Fragment_Youtube extends Fragment {
+public class Fragment_Youtube extends Fragment implements View.OnClickListener, OnYotubeItemClick  {
 
     YouTubePlayerView m_youtubeview;
     View m_view;
     ListView m_listView;
     YoutubeListAdapter m_youtubeListAdapter;
 
-    List<String> listTitle;
-    List<String> listPublishedAt;
-    List<String> listVideoid;
+    List<String> m_listTitle;           // Youtube 영상 제목
+    List<String> m_listPublishedAt;     // Youtube 업로드 날짜
+    List<String> m_listVideoid;         // Youtube 영상 고유 아이디
 
-    LinearLayout m_linearYoutube;
+    LinearLayout m_LLYoutube;           //
+
 
     int nTimer = 0;
 
-    ProgressDialog dialog;
-    int m_nPos_dialog=0;
-    //static final String[] LIST_MENU = {"LIST1", "LIST2", "LIST3"} ;
+    Button m_Btn_Main, m_Btn_Sub;
 
-    Timer timer;
+    ProgressDialog dialogYoutube;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -95,177 +96,208 @@ public class Fragment_Youtube extends Fragment {
         Log.v("Youtube_onCreateView", "CreateView");
         m_view = inflater.inflate(R.layout.fragment_youtube, container, false);
 
-        m_listView = (ListView) m_view.findViewById(R.id.lvList);
+        m_listView = m_view.findViewById(R.id.lvList);
 
-        m_linearYoutube = (LinearLayout) m_view.findViewById(R.id.linearYoutube);
+        m_LLYoutube = m_view.findViewById(R.id.linearYoutube);
 
 
-        m_youtubeListAdapter = new YoutubeListAdapter();
+        m_youtubeListAdapter = new YoutubeListAdapter(this);
         m_listView.setAdapter(m_youtubeListAdapter);
 
 
+
+        m_Btn_Main = m_view.findViewById(R.id.BTN_main);
+        m_Btn_Main.setOnClickListener(this);
+
+        m_Btn_Sub = m_view.findViewById(R.id.BTN_sub);
+        m_Btn_Sub.setOnClickListener(this);
+
+
+        String strUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=UU-qEqMeTaSnmy3kdoN-rF4w&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
         YoutubeParshing youtubeParshing = new YoutubeParshing();
-        youtubeParshing.execute();
-
-
-
-//        TimerTask tt = new TimerTask() {
-//            @Override
-//            public void run() {
-//
-//                ((MainActivity) getContext()).runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//
-//                        if(dialog != null)
-//                        {
-//                            return ;
-//                        }
-//
-//                        if (m_youtubeListAdapter != null) {
-//
-//                            Log.i("onResume", "notify");
-//
-//                            if (!(listTitle == null || !(listTitle.size() > 0 && listPublishedAt.size() > 0 && listVideoid.size() > 0))) {
-//                                for (int i = 0; i < listTitle.size(); i++) {
-//                                    m_youtubeListAdapter.additem(listTitle.get(i), "", listVideoid.get(i), listPublishedAt.get(i));
-//                                }
-//                            }
-//
-//
-//                            m_youtubeListAdapter.notifyDataSetChanged();
-//
-//                            // 타이머 한번만 동작하게 하기 위해서 추가가
-//                           if(nTimer > 0)
-//                                timer.cancel();
-//                            nTimer++;
-//
-//                        }
-//                    }
-//                });
-//
-//            }
-//        };
-//
-//        timer = new Timer();
-//        timer.schedule(tt,0,3000);
+        youtubeParshing.execute(strUrl);
 
         return m_view;
     }
 
     public void OnCheck() {
-        if (dialog != null) {
+        if (dialogYoutube != null) {
             return;
         }
 
-        if (m_youtubeListAdapter != null) {
+        m_youtubeListAdapter = null;
+        m_youtubeListAdapter = new YoutubeListAdapter(this);
+        m_listView.setAdapter(m_youtubeListAdapter);
 
-            if (!(listTitle == null || !(listTitle.size() > 0 && listPublishedAt.size() > 0 && listVideoid.size() > 0))) {
-                for (int i = 0; i < listTitle.size(); i++) {
-                    m_youtubeListAdapter.additem(listTitle.get(i), "", listVideoid.get(i), listPublishedAt.get(i));
-                }
+        if (!(m_listTitle == null || !(m_listTitle.size() > 0 && m_listPublishedAt.size() > 0 && m_listVideoid.size() > 0))) {
+            for (int i = 0; i < m_listTitle.size(); i++) {
+                m_youtubeListAdapter.additem(m_listTitle.get(i), "", m_listVideoid.get(i), m_listPublishedAt.get(i));
             }
-            m_youtubeListAdapter.notifyDataSetChanged();
         }
+        m_youtubeListAdapter.notifyDataSetChanged();
+
 
     }
 
+    @Override
+    public void onClick(View v) {
+
+        YoutubeParshing youtubeParshing = new YoutubeParshing();
+        String strUrl;
+
+        switch (v.getId()) {
+            case R.id.BTN_main:
+
+                strUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=UU-qEqMeTaSnmy3kdoN-rF4w&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
+                youtubeParshing.execute(strUrl);
+
+                break;
+
+            case R.id.BTN_sub:
+
+                strUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=PL4P6SBDceLgFGaOSkipbSojlUYAxAXwku&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
+                youtubeParshing.execute(strUrl);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void OnClickItem(final String a_strID) {
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+        dialog.setTitle("Youtube");
+        dialog.setMessage("유튜브를 여시겠습니까?");
+        dialog.setPositiveButton("예", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                Uri uri = Uri.parse("https://www.youtube.com/watch?v="+a_strID);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        });
+
+        dialog.setNegativeButton("아니요", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+       dialog.show();
+
+    }
 
     //첫번재 데이터 타입은 doInBackground() 메소드의 파라미터 타입을 지정
 
     //두번재 파라미터의 타입은 onProgressUpdate() 메소드의 파라미터 타입을 지정
 
     //세번째 파라미터의 타입은 onPostExecute() 메소드의 파라미터 타입을 지정
-    class YoutubeParshing extends AsyncTask<Integer, Integer, Boolean>{
+    class YoutubeParshing extends AsyncTask<String, Integer, Boolean> {
 
         String result = "";
-   //     ArrayList<String> listTitle = new ArrayList<String>();
-    //    ArrayList<String> listPublishedAt = new ArrayList<String>();
-   //     ArrayList<String> listVideoid = new ArrayList<String>();
-        public YoutubeParshing() {
+
+        YoutubeParshing() {
             super();
         }
-
 
 
         // 초기화 단계
         @Override
         protected void onPreExecute() {
 
-            listTitle = new ArrayList<String>();
-            listPublishedAt = new ArrayList<String>();
-            listVideoid = new ArrayList<String>();
+            m_listTitle = new ArrayList<>();
+            m_listPublishedAt = new ArrayList<>();
+            m_listVideoid = new ArrayList<>();
 
-            dialog = new ProgressDialog(getContext(),"유튜브 영상 얻어오는중");
-            dialog.setCanceledOnTouchOutside(false);    // 프로그래스바 작동할때 바깥부분 클릭 금지
-            dialog.show();
+            dialogYoutube = new ProgressDialog(getContext(), "유튜브 영상 얻어오는중");
+            dialogYoutube.setCanceledOnTouchOutside(false);    // 프로그래스바 작동할때 바깥부분 클릭 금지
+            dialogYoutube.show();
             super.onPreExecute();
 
         }
 
 
-        protected Boolean doInBackground(Integer... Integers)
-        {
-
-
-
-
-                try {
+        protected Boolean doInBackground(String... Strings) {
+            try {
 //                    URL url = new URL("https://www.googleapis.com/youtube/v3/search?part=snippet&q=ENTER SEARCH WORD &maxResults=20&key=ENTER YOUR API KEY HERE");
-                    String strA = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=LoveChurch1611&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
-                    String strB = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=Hi&maxResults=20&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
-                    String strC = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU-qEqMeTaSnmy3kdoN-rF4w&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
-
-                    URL url = new URL(strC);
-
-                    URLConnection con = url.openConnection();
-                    InputStream is = con.getInputStream();
-                    InputStreamReader isr = new InputStreamReader(is);
-                    BufferedReader reader = new BufferedReader(isr);
-
-                    while (true) {
-                        String data = reader.readLine();
-                        if (data == null) break;
-                        result += data;
-                    }
-                    Log.e("MainActivity", result);
-                    JSONObject obj = new JSONObject(result);
-                    JSONArray arr = (JSONArray) obj.get("items");
-
-                    int i = 0;
-                    for (i = 0; i < arr.length(); i++) {
-                        JSONObject item = (JSONObject) arr.get(i);
-                        JSONObject snippet = (JSONObject) item.get("snippet");
-                        String title = (String) snippet.get("title");
-                        String publishedAt = (String) snippet.get("publishedAt");
-
-                        JSONObject resourceId = snippet.optJSONObject("resourceId");
-                        String videoid = (String) resourceId.get("videoId");
-
-                        listTitle.add(title);
-                        Log.i("Fragment[" + i + "]", listTitle.get(i));
-                        listPublishedAt.add(publishedAt);
-                        listVideoid.add(videoid);
-
-                        m_nPos_dialog = i;
-                        publishProgress(m_nPos_dialog);
-
-                    }
-
-                    m_nPos_dialog = i;
-                    publishProgress(m_nPos_dialog);
+                String strA = "https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forUsername=LoveChurch1611&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
+                String strB = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=Hi&maxResults=20&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
 
 
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                    return false;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return false;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    return false;
+                // 메인설
+                String strC = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU-qEqMeTaSnmy3kdoN-rF4w&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
+
+                // 필수설교
+                String strD = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=PL4P6SBDceLgFGaOSkipbSojlUYAxAXwku&key=AIzaSyAGqpbHB3Dbke3gxgEOGYuLSAnSb7Q32Fo";
+
+                URL url = new URL(Strings[0]);
+
+                URLConnection con = url.openConnection();
+                InputStream is = con.getInputStream();
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader reader = new BufferedReader(isr);
+
+                // Byte 단위로 받아와서 데이터 저장
+                while (true) {
+                    String data = reader.readLine();
+                    if (data == null) break;
+                    result += data;
                 }
+                Log.d("MainActivity", result);
+                JSONObject obj = new JSONObject(result);
+                JSONArray arr = (JSONArray) obj.get("items");
+
+                int i = 0;
+                for (i = 0; i < arr.length(); i++) {
+                    JSONObject item = (JSONObject) arr.get(i);
+                    JSONObject snippet = (JSONObject) item.get("snippet");
+                    String title = (String) snippet.get("title");
+                    //   String publishedAt = (String) snippet.get("publishedAt");
+
+                    JSONObject resourceId = snippet.optJSONObject("resourceId");
+                    String videoid = (String) resourceId.get("videoId");
+
+                    JSONObject contentDetails = (JSONObject) item.get("contentDetails");
+                    String videoPublishedAt = (String) contentDetails.get("videoPublishedAt");
+
+
+                    if(title.length()>40)
+                    {
+                        String sTitle;
+                        sTitle = title.substring(0,40);
+                        sTitle += "...";
+                        m_listTitle.add(sTitle);
+
+                    }else
+                        m_listTitle.add(title);
+                    Log.d("Fragment[" + i + "]", m_listTitle.get(i));
+
+                    // ex) 2019-01-28T10:29:24Z
+                    int nIndex = videoPublishedAt.indexOf('T');
+                    int nLen = videoPublishedAt.length();
+                    String sVideoDate = videoPublishedAt.substring(0, nIndex);
+                    sVideoDate += " "+videoPublishedAt.substring(nIndex+1,nLen-1);
+
+                    m_listPublishedAt.add(sVideoDate);
+                    m_listVideoid.add(videoid);
+
+
+                    //  m_nPos_dialog = i;
+                    //    publishProgress(m_nPos_dialog);
+
+                }
+
+                //  m_nPos_dialog = i;
+                //   publishProgress(m_nPos_dialog);
+
+
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
 
 
             return true;
@@ -276,8 +308,9 @@ public class Fragment_Youtube extends Fragment {
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
 
-            dialog.dismiss();
-            dialog = null;
+            if(dialogYoutube != null)
+                dialogYoutube.dismiss();
+            dialogYoutube = null;
 
             OnCheck();
         }
@@ -300,36 +333,5 @@ public class Fragment_Youtube extends Fragment {
         }
 
 
-
-    };
-
-
-
-    class YoutubeTask extends AsyncTask<Integer, Integer, Integer>
-    {
-        public YoutubeTask() {
-            super();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            super.onPostExecute(integer);
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-        }
-
-        @Override
-        protected Integer doInBackground(Integer... integers) {
-            return null;
-        }
     }
-
 }

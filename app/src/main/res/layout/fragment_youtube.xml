@@ -6,6 +6,33 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <Button
+                android:id="@+id/BTN_main"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_margin="5dp"
+                android:text="사랑침례교회"
+                />
+            <Button
+                android:id="@+id/BTN_sub"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_margin="5dp"
+                android:text="필수설교"
+                />
+
+        </LinearLayout>
+
+    </RelativeLayout>
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

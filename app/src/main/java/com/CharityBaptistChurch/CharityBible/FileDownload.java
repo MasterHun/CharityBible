@@ -51,10 +51,10 @@ public class FileDownload {
     DownloadThread dThread;
 
     public FileDownload() {
-        File_Name = "kornkrv.zip";
-        File_type = "zip";
+        File_Name = "kornkrv.cbk";
+        File_type = "cbk";
 
-        fileURL = "192.168.0.7/test/kornkrv"; // URL
+        fileURL = "175.198.115.173:8000/test/kornkrv"; // URL
         Save_folder = "/charitybible/bible";
 
         // 다운로드 경로를 외장메모리 사용자 지정 폴더로 함.
@@ -72,7 +72,8 @@ public class FileDownload {
         File_type = a_strFileType;
 
         fileURL = a_strUrl; // URL
-        Save_folder = "/charitybible/bible";
+       if(Save_folder.isEmpty())
+            Save_folder = "/charitybible/bible";
 
         // 다운로드 경로를 외장메모리 사용자 지정 폴더로 함.
         String ext = Environment.getExternalStorageState();

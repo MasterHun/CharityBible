@@ -1,9 +1,9 @@
 package com.CharityBaptistChurch.CharityBible.Activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,9 +13,7 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_ReadBible;
 import com.CharityBaptistChurch.CharityBible.R;
 import com.CharityBaptistChurch.CharityBible.Util;
 
@@ -28,12 +26,12 @@ import com.CharityBaptistChurch.CharityBible.Util;
 public class ChapterTableActivity extends AppCompatActivity {
 
     private String strBibleContents;
-    private int nBibleChapter;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.hide();
 
         return true;
@@ -50,7 +48,7 @@ public class ChapterTableActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chaptertable);
 
-        mTableLayout = (TableLayout) findViewById(R.id.table_chapter);
+        mTableLayout = findViewById(R.id.table_chapter);
         mTableLayout.setShrinkAllColumns(true);
 
         // 연속클릭 방지코드
@@ -76,13 +74,14 @@ public class ChapterTableActivity extends AppCompatActivity {
                 }
 
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                 int nBibleSelectedChapter = Integer.parseInt(strBibleSelectedChapter);
 
                 if( nBibleSelectedChapter > 0 &&  strBibleContents != null ) {
 
-                    Log.i("ChapterTable", "ChapterTableActivity onClickListener");
+                    Log.d("ChapterTable", "ChapterTableActivity onClickListener");
                     intent.putExtra("Chapter", strBibleSelectedChapter);
                     intent.putExtra("Contents", strBibleContents);
                     startActivity(intent);
@@ -93,7 +92,7 @@ public class ChapterTableActivity extends AppCompatActivity {
         };
 
         Intent intent = getIntent();
-        nBibleChapter = intent.getExtras().getInt("bookPosition");    // 각 성경마다 장수 ex) 창세기 == 50장
+        int nBibleChapter = intent.getExtras().getInt("bookPosition");    // 각 성경마다 장수 ex) 창세기 == 50장
         strBibleContents= intent.getExtras().getString("bookName");   // 성경이 넘어온다. '창세기'
 
 
@@ -114,6 +113,7 @@ public class ChapterTableActivity extends AppCompatActivity {
 
             for (int j = 0; j < 8; j++) {
                 final Button tb = new Button(this);
+                tb.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.buttonshape));
                 tb.setOnClickListener(onClickListener);
                 tb.setText("" + nCount);
                 tb.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
@@ -131,6 +131,7 @@ public class ChapterTableActivity extends AppCompatActivity {
             final TableRow tableRow = new TableRow(this);
             for (int i = 0; i < nNam; i++) {
                 final Button tb = new Button(this);
+                tb.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.buttonshape));
                 tb.setOnClickListener(onClickListener);
                 tb.setText("" + nCount);
                 tb.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));

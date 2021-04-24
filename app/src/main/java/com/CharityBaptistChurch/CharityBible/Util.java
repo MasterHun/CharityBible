@@ -1,5 +1,7 @@
 package com.CharityBaptistChurch.CharityBible;
 
+import android.os.Environment;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -62,6 +64,32 @@ public class Util {
     // 다운로드 가능한 성경 체크
     public static ArrayList<HashMap<String,String>> m_hsDownLoadBibles = new ArrayList<HashMap<String,String>>();
 
+    // 다운로드 받을 성경 폴더 이름
+    public static String m_strDirectory = "Download";
+
+    // 서버 정보
+    public static String m_strServerIP = "http://175.198.115.173:8080";
+
+    // */FileDownload/Bibles/korHKJV.cbk
+    public static String m_strServerBiblesxtension = ".cbk";
+    public static String m_strServerBiblesDirectory = "/FileDownload/Bibles/";
+    public static String[] m_strServerBiblesName    = { "korHKJV",      // 한글 킹제임스 흠정역
+                                                        "engHKJV",      // 영어 킹제임스 흠정역
+                                                        "korHKJVM",     // 한글 킹제임스 흠정역 마제스티판
+                                                        "engHKJVM",     // 영어 킹제임스 흠정역 마제스티판
+                                                        "korNIV",       // 한글 개역성경
+                                                        "engNIV"};      // 영어 개역성경
+
+    // */FileDownload/BibleSounds/korHKJVSound/korHKJVSound01.scbk  ex) 창세기 -> 01 , 출애굽기 -> 02 . . . 요한계시록 -> 66
+    public static String m_strServerBibleSoundsExtension = ".scbk";
+    public static String m_strServerBibleSoundsDirectory = "/FileDownload/BibleSounds";
+    public static String[] m_strServerBibleSoundsName   = { "korHKJVSound",     // 한글 킹제임스 흠정역
+                                                            "engHKJVSound",     // 영어 킹제임스 흠정역
+                                                            "korHKJVMSound",    // 한글 킹제임스 흠정역 마제스티판
+                                                            "engHKJVMSound",    // 영어 킹제임스 흠정역 마제스티판
+                                                            "korNIVSound",      // 한글 개역성경
+                                                            "engNIVSound"};     // 영어 개역성경
+
 
 
 
@@ -85,6 +113,26 @@ public class Util {
         if(!a_strBookName.equals(""))
         {
             strBibleBookVersion = a_strBookName;
+        }
+        return false;
+    }
+
+
+    /* Checks if external storage is available for read and write */
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public static boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
         }
         return false;
     }

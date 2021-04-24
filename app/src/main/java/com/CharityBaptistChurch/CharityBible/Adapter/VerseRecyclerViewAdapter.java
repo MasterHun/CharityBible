@@ -1,14 +1,12 @@
 package com.CharityBaptistChurch.CharityBible.Adapter;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,101 +14,9 @@ import android.widget.TextView;
 
 import com.CharityBaptistChurch.CharityBible.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // 참고 ->> https://thepassion.tistory.com/294
-//public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecyclerViewAdapter.StdViewHolder>{
-//
-//    public interface OnListItemLongSelectedInterface{
-//        void onItemLongSelected(View v, int position);
-//    }
-//
-//    public interface OnListItemSelectedInterface{
-//        void OnListItemSelectedInterface(View v, int position);
-//    }
-//
-//    private OnListItemSelectedInterface mListener;
-//    private OnListItemLongSelectedInterface mLongListener;
-//
-//
-//    private SparseBooleanArray mSelectedItems = new SparseBooleanArray(0); // 다중선택시 선택 Position을 저장하는공간
-//
-//
-//
-//    // ----------------
-//
-//    Context mContext;
-//    RecyclerView mRecyclerView;
-//    List<String> mdata;
-//
-//    public VerseRecyclerViewAdapter(Context context
-//            , OnListItemSelectedInterface listner
-//            , OnListItemLongSelectedInterface longListener
-//            , RecyclerView recyclerview) {
-//        this.mContext = context;
-//        this.mListener =listner;
-//        this.mLongListener = longListener;
-//        this.mRecyclerView = recyclerview;
-//    }
-//
-//    public void setData(ArrayList<String> data){
-//        this.mdata = data;
-//        notifyDataSetChanged();     // 어댑터에서 변화를 갱신해주는 함수.
-//    }
-//
-//
-//    @NonNull
-//    @Override
-//    public StdViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-//        LayoutInflater inflater = LayoutInflater.from(mContext);
-//        View view = inflater.inflate(R.layout.verselist_item, viewGroup, false);
-//
-//        StdViewHolder vh = new StdViewHolder(view);
-//        return vh;
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(@NonNull StdViewHolder holder, int position) {
-//        holder.textView.setText(mdata.get(position));
-//    }
-//
-//    @Override
-//    public int getItemCount() {
-//        return mdata.size();
-//    }
-//
-//
-//
-//    public static class StdViewHolder extends RecyclerView.ViewHolder {
-//        public TextView textView;
-//
-//        public StdViewHolder(@NonNull View itemView){
-//            super(itemView);
-//            this.textView = itemView.findViewById(R.id.text_verse);
-//
-//            itemView.setOnClickListener(new View.OnClickListener(){
-//                @Override
-//                public void onClick(View v) {
-//                    int position = getAdapterPosition();
-//
-//
-//
-//                    Log.d("RecyclerView","position="+getAdapterPosition());
-//                }
-//            });
-//
-//            itemView.setOnLongClickListener(new View.OnLongClickListener(){
-//                @Override
-//                public boolean onLongClick(View v) {
-//
-//                    Log.d("RecyclerView","Long position="+getAdapterPosition());
-//                    return false;
-//                }
-//            });
-//        }
-//    }
-//}
 
 /*
 * @class    : VerseRecyclerViewAdapter
@@ -140,8 +46,7 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
 
 
     private int m_nFontSize;
-
-    private boolean m_bCompare = false;             // true:성경비교x/false:성경비교o
+    private boolean m_bCompare;             // true:성경비교x/false:성경비교o
 
     public VerseRecyclerViewAdapter(Context context
             , RecyclerView recyclerView
@@ -184,7 +89,7 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
     }
 
     public void setData(List<String> dataNumber, List<String> dataVerse) {
-        Log.i("Verse_Adapter","setData");
+        Log.d("Verse_Adapter","setData");
         mdataVerse = dataVerse;
         mdataNumber = dataNumber;
 
@@ -194,25 +99,22 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
     @NonNull
     @Override
     public StdViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.i("Verse_Adapter","OnCreateViewHolder");
+        Log.d("Verse_Adapter","OnCreateViewHolder");
         LayoutInflater inflate = LayoutInflater.from(mContext);
         View view = inflate.inflate(R.layout.verselist_item, parent, false);
 
-        StdViewHolder vh = new StdViewHolder(view);
-        return vh;
+        return new StdViewHolder(view);
     }
-
-
 
     @Override
     public int getItemCount() {
-        Log.i("Verse_Adapter","getItemCount");
+        Log.d("Verse_Adapter","getItemCount");
         return mdataVerse.size();
     }
 
     @Override
     public void onBindViewHolder(@NonNull StdViewHolder holder, int position) {
-        Log.i("Verse_Adapter","OnBindViewHolder");
+        Log.d("Verse_Adapter","OnBindViewHolder");
 
         holder.textVerse.setTextSize(TypedValue.COMPLEX_UNIT_SP,m_nFontSize);
         holder.textNumber.setTextSize(TypedValue.COMPLEX_UNIT_SP,m_nFontSize);
@@ -248,8 +150,8 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
     }
 
     private void toggleItemSelected(int position) {
-        Log.i("Verse_Adapter","toggleItemSelected");
-        if (mSelectedItems.get(position, false) == true) {
+        Log.d("Verse_Adapter","toggleItemSelected");
+        if (mSelectedItems.get(position, false)) {
             mSelectedItems.delete(position);
             notifyItemChanged(position);
         } else {
@@ -269,19 +171,37 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
         public StdViewHolder(@NonNull View itemView) {
 
             super(itemView);
-            this.textVerse= itemView.findViewById(R.id.text_verse);
-            this.textNumber= itemView.findViewById(R.id.text_number);
+            this.textVerse  = itemView.findViewById(R.id.text_verse);
+            this.textNumber = itemView.findViewById(R.id.text_number);
 
-            Log.i("Verse_Adapter","StdViewHolder");
+            Log.d("Verse_Adapter","StdViewHolder");
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    toggleItemSelected(position);
-                    mListener.onItemSelected(v, getAdapterPosition());
+                    int pos= getAdapterPosition();
+
+                    int numA = Integer.parseInt( mdataNumber.get(pos).trim() );
+                    int numB = Integer.parseInt( mdataNumber.get(pos+1).trim() );
+
+                    if( numA == numB )
+                    {
+                        mListener.onItemSelected(v, getAdapterPosition());
+                        mListener.onItemSelected(v, getAdapterPosition() + 1);
+
+                        toggleItemSelected(pos);
+                        toggleItemSelected(pos + 1);
+
+                    }else if( numA < numB )
+                    {
+                        mListener.onItemSelected(v, getAdapterPosition());
+                        mListener.onItemSelected(v, getAdapterPosition() - 1);
+                        toggleItemSelected(pos);
+                        toggleItemSelected(pos - 1);
+
+                    }
 
 
-                    Log.d("test", "position = " + position);
+                    Log.d("test", "position = " + pos);
                 }
             });
 
@@ -296,16 +216,4 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
     }
 
 
-    // Clear는 사용할일 없을듯
-//    public void clearSelectedItem() {
-//        int position;
-//
-//        for (int i = 0; i < mSelectedItems.size(); i++) {
-//            position = mSelectedItems.keyAt(i);
-//            mSelectedItems.put(position, false);
-//            notifyItemChanged(position);
-//        }
-//
-//        mSelectedItems.clear();
-//    }
 }

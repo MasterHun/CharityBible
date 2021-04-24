@@ -1,12 +1,12 @@
 package com.CharityBaptistChurch.CharityBible.Activity;
 
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -19,8 +19,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.CharityBaptistChurch.CharityBible.R;
@@ -28,33 +26,30 @@ import com.CharityBaptistChurch.CharityBible.Util;
 
 /*
 * Type : Activity
-* Contents : 성경을 선택하는 액티비티
+* Contents : 성경을 선택하는 액티비티 ( 창세기, 출애굽기 같은 서적을 )
 * */
+
 public class BibleTabActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final int TABLE_BUTTON_WIDTH = 7;
+    private Button      mTextSimpleTestament;       // 간략하게 보기 탭 버튼
+    private ListView    mListSimpleTestament;       //
 
 
-    // 간략하게 보기 탭
-    private Button mTextSimpleTestament;
-    private ListView mListSimpleTestament;
-
-    // 리스트로 보기 탭
-    private Button mTextListTestament;
-    private TableLayout mTableLayout;
+    private Button      mTextListTestament;         // 리스트로 보기 탭튼 버튼
 
     private ViewFlipper mFlipper;
 
     boolean mIsSelected = false;
 
     // 두번클릭 방지를 위한 코드
-    private static final long MIN_CLICK_INTERVAL=600;
+    private static final long MIN_CLICK_INTERVAL = 600;
     private long mLastClickTime;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.hide();
 
         return true;
@@ -69,7 +64,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
         mListSimpleTestament = (ListView) findViewById(R.id.list);
 
         mTextListTestament = (Button) findViewById(R.id.list_testament);
-        mTableLayout = (TableLayout) findViewById(R.id.table);
+        TableLayout mTableLayout = (TableLayout) findViewById(R.id.table);
         mTableLayout.setPadding(50, 20, 50, 0);
 
         mFlipper = (ViewFlipper) findViewById(R.id.flipper);
@@ -105,6 +100,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
 
             while (nCount < orginalAcms.length) {
                 final Button btn = new Button(this);
+                btn.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.buttonshape));
                 btn.setOnClickListener(new Button.OnClickListener()
                 {
                     @Override
@@ -140,6 +136,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
                 btn.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
                 tableRow.addView(btn);
 
+                int TABLE_BUTTON_WIDTH = 7;
                 if ((nCount + 1) % TABLE_BUTTON_WIDTH == 0 && nCount + 1 < orginalAcms.length) {
                     nCount++;
                     break;
@@ -225,35 +222,48 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
         }
     };
 
-    // @@Function
-    // 버튼 클릭할때마다 색상이 변경되게.
+
+
+    /*
+     * @ Func    : setButtonStyle
+     * @ Param   : x
+     * @ Date    : 2020.10.08
+     * @ Author  : mhpark
+     * @ Context : 버튼 클릭할때마다 색상이 변경되게 하는 함수
+     */
     void setButtonStyle() {
+
         if (mIsSelected) {
             mTextSimpleTestament.setTypeface(mTextSimpleTestament.getTypeface(), Typeface.BOLD);
             mTextSimpleTestament.setTextColor(Color.WHITE);
-          //  mTextSimpleTestament.setBackgroundColor(Color.BLACK);
+            mTextSimpleTestament.setBackgroundColor(Color.BLACK);
+
             mTextListTestament.setTypeface(null, Typeface.NORMAL);
             mTextListTestament.setTextColor(Color.BLACK);
-           // mTextListTestament.setBackgroundColor(Color.DKGRAY);
-        } else {
+            mTextListTestament.setBackgroundColor(Color.WHITE);
+
+        }
+        else {
             mTextListTestament.setTypeface(mTextListTestament.getTypeface(), Typeface.BOLD);
             mTextListTestament.setTextColor(Color.WHITE);
-           // mTextListTestament.setBackgroundColor(Color.BLACK);
+            mTextListTestament.setBackgroundColor(Color.BLACK);
+
             mTextSimpleTestament.setTypeface(null, Typeface.NORMAL);
             mTextSimpleTestament.setTextColor(Color.BLACK);
-           // mTextSimpleTestament.setBackgroundColor(Color.DKGRAY);
-
+            mTextSimpleTestament.setBackgroundColor(Color.WHITE);
         }
     }
 
-
-    // @@Function
-    // 성경 배열로 정리
-    // - 필요한 목록은 추가로 입력하면됨.
-    // - 시간되면 유틸쪽으로 옮겨도 될거같아보임
-    int findBiblePosition(String a_strBibleName, String a_strBibleSelecter)
+    /*
+     * @ Func    : findBiblePosition
+     * @ Param   : a_strBibleName(성경전서 이름을 받음), a_strBibleSelect(성경전서 종류를 받)
+     * @ Date    : 2020.10.08
+     * @ Author  : mhpark
+     * @ Context : 성경 배열로 정리하는 함수 (시간되면 유틸쪽으로 옮겨도 될거같아보임)
+     */
+    int findBiblePosition(String a_strBibleName, String a_strBibleSelect)
     {
-        switch(a_strBibleSelecter)
+        switch(a_strBibleSelect)
         {
             case "KOR":
             {
@@ -261,9 +271,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
 
                 for(int i =0; i < bible.length; i++) {
                     if(bible[i].equals(a_strBibleName))
-                    {
                         return i;
-                    }
                 }
             }
             case "KOR_ACM":
@@ -272,9 +280,7 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
 
                 for(int i =0; i < bible_ACM.length; i++) {
                     if(bible_ACM[i].equals(a_strBibleName))
-                    {
                         return i;
-                    }
                 }
             }
         }

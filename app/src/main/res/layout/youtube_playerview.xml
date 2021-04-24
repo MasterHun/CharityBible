@@ -24,21 +24,35 @@
         />
 
     <LinearLayout
+        android:id="@+id/LL_youtubeitem"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:orientation="vertical">
+<!--        <view-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="1dp"/>-->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tvTitle"
+            android:textSize="16sp"
+            android:textStyle="bold"
             android:text="Youtube Title"/>
-
+<!--        <TextView-->
+<!--            android:layout_marginStart="2sp"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:id="@+id/tvContext"-->
+<!--            android:text="유투브 동영상에 들어가게 될 내용들이 담기게 됩니다."/>-->
+<!--        <view-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="1dp"/>-->
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tvContext"
-            android:text="유투브 동영상에 들어가게 될 내용들이 담기게 됩니다."/>
+            android:id="@+id/tvDate"
+            android:text="2020/10/21"/>
 
 
     </LinearLayout>

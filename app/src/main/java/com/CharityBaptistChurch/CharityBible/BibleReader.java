@@ -1,5 +1,7 @@
 package com.CharityBaptistChurch.CharityBible;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -452,6 +454,9 @@ public class BibleReader {
             // 2-1. zip 파일안에 있는 목록의 파일에 접근.
             ZipEntry entry = zip.getEntry(strSearchFile);
 
+            if(entry == null)
+                return null;
+
             // 2-2. 선택된 목록의 파일을 읽어온다.
             InputStream input = zip.getInputStream(entry);
 
@@ -554,6 +559,12 @@ public class BibleReader {
         // 1. 경로에있는 압축파일 읽어들인다.
         File zipfileA = new File(strPathA);
         File zipfileB = new File(strPathB);
+
+        if( !(zipfileA.isFile() && zipfileB.isFile()) )
+        {
+            Log.d("BibleParshing 1","File Not Access");
+            return null;
+        }
 
         ArrayList<String[]> arrayList = new ArrayList<>();   // 파싱한 성경데이터 저장한 리스트
 
@@ -704,6 +715,9 @@ public class BibleReader {
             }
 
         } catch (IOException e) {
+            e.printStackTrace();
+        }catch (NullPointerException e)
+        {
             e.printStackTrace();
         }
 

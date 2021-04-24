@@ -1,4 +1,5 @@
 package com.CharityBaptistChurch.CharityBible.Fragment;
+
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,7 +10,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.TestLooperManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,58 +23,47 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.CharityBaptistChurch.CharityBible.Activity.MainActivity;
 import com.CharityBaptistChurch.CharityBible.Adapter.BibleDBAdapter;
 import com.CharityBaptistChurch.CharityBible.Adapter.VerseRecyclerViewAdapter_Setting;
 import com.CharityBaptistChurch.CharityBible.BibleReader;
 import com.CharityBaptistChurch.CharityBible.FileDownload;
 import com.CharityBaptistChurch.CharityBible.R;
+import com.CharityBaptistChurch.CharityBible.Util;
 import com.willowtreeapps.spruce.BuildConfig;
-
-import org.w3c.dom.Text;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 
 
 public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
-    View m_view;
-    SeekBar m_bartextsize;
-    RecyclerView m_RecyclerView;
     Button m_btnFileDownload;
 
     TextView m_tvTextSize;
 
     String m_SavePath;
     String m_FileName;
-    FileDownload m_fileDownload;
     //   VerseRecyclerViewAdapter mAdapter;
     FileDownload.DownloadThread dThread;
-
-    public int m_nSize = 0;
 
     public final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     public final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
@@ -95,9 +84,14 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
     BibleDBAdapter dbAdapter;
 
+
+    View m_view;
+    SeekBar m_bartextsize;
+    RecyclerView m_RecyclerView;
+
     CheckedTextView ctBibleCompare;
 
-    LinearLayout linearBible, linearCompareBible;
+    LinearLayout linearBible, linearCompareBible, linearBibleDownload;
     TextView tvBible,tvBibleList,tvCompareBible, tvCompareBibleList;
 
     private static int m_nSelectBible = -1;
@@ -105,56 +99,19 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
     private static int m_nSelectDownload = -1;
     private static int m_nSelectDelete = -1;
 
-    // 디비에서 데이터 받고 난 이후의 작업들
-    @Override
-    public void onStart() {
-        super.onStart();
-
-
-        m_tvTextSize.setText(m_strFontSize);
-        m_bartextsize.setProgress(Integer.parseInt(m_strFontSize));
-
-        // 역본 사용 체크가 되어있다면
-        if(m_strIsReplace.equals("Y"))
-            ctBibleCompare.setChecked(true);
-        else
-            ctBibleCompare.setChecked(false);
-
-        if (ctBibleCompare.isChecked())
-        {
-            linearCompareBible.setClickable(true);
-            tvCompareBible.setTextColor( ContextCompat.getColor(getContext(),R.color.colorBlack));
-            tvCompareBibleList.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray3));
-
-            dbAdapter.UpdateSettingIsReplace("Y");
-
-        }else
-        {
-            linearCompareBible.setClickable(false);
-            tvCompareBible.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray2));
-            tvCompareBibleList.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray1));
-            dbAdapter.UpdateSettingIsReplace("N");
-        }
-
-
-
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         m_view = inflater.inflate(R.layout.fragment_setting, container, false);
 
-        m_fileDownload = new FileDownload();
-
-        m_RecyclerView = (RecyclerView) m_view.findViewById(R.id.rv);
-        m_bartextsize = (SeekBar) m_view.findViewById(R.id.sbtextsize);
+        m_RecyclerView = m_view.findViewById(R.id.rv);
+        m_bartextsize = m_view.findViewById(R.id.sbtextsize);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         m_RecyclerView.setLayoutManager(layoutManager);
 
-        m_tvTextSize = (TextView) m_view.findViewById(R.id.tvTextSize);
+        m_tvTextSize = m_view.findViewById(R.id.tvTextSize);
 
 
 
@@ -164,11 +121,26 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
-                VerseRecyclerViewAdapter_Setting s = (VerseRecyclerViewAdapter_Setting)m_RecyclerView.getAdapter();
-                s.setFontSize(progress);
-                m_tvTextSize.setText(Integer.toString(progress));
-                s.notifyDataSetChanged();
-                m_RecyclerView.setAdapter(s);
+                VerseRecyclerViewAdapter_Setting adapter = (VerseRecyclerViewAdapter_Setting)m_RecyclerView.getAdapter();
+                if( progress >= 10)
+                {
+
+                    assert adapter != null;
+                    adapter.setFontSize(progress);
+                    m_tvTextSize.setText(Integer.toString(progress));
+                    adapter.notifyDataSetChanged();
+                    m_RecyclerView.setAdapter(adapter);
+                }else
+                {
+                    assert adapter != null;
+                    adapter.setFontSize(progress);
+                    m_tvTextSize.setText(Integer.toString(progress));
+                    adapter.notifyDataSetChanged();
+                    m_RecyclerView.setAdapter(adapter);
+
+                    seekBar.setProgress(10);
+                }
+
 
             }
 
@@ -188,8 +160,6 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
             }
         });
 
-        init();
-
         int readCheck = 0;
         int writeCheck = 0;
         if(getActivity() != null) {
@@ -201,7 +171,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
             Toast.makeText(getContext(),"권한음슴",Toast.LENGTH_SHORT).show();
         }
 
-        requestPermission();
+     //   requestPermission();
 
 
 
@@ -244,35 +214,14 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
                     dbAdapter.UpdateSettingIsReplace("N");
                 }
 
+                init();
+
             }
         });
 
 
-
-
-
-
-//        btn1 = (Button)m_view.findViewById(R.id.btn1);
-//        btn2 = (Button)m_view.findViewById(R.id.btn2);
-//        btn3 = (Button)m_view.findViewById(R.id.btn3);
-//        btn4 = (Button)m_view.findViewById(R.id.btn4);
-//        btn5 = (Button)m_view.findViewById(R.id.btn5);
-//        btn1.setOnClickListener(this);
-//        btn2.setOnClickListener(this);
-//        btn3.setOnClickListener(this);
-//        btn4.setOnClickListener(this);
-//        btn5.setOnClickListener(this);
-//
-//        lv = m_view.findViewById(R.id.lv1);
-
-//        //파일 다운로드 버튼 클릭
-//        m_btnFileDownload = (Button)m_view.findViewById(R.id.btn_filedownload);
-//        m_btnFileDownload.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                StartDownload();
-//            }
-//        });
+        linearBibleDownload = m_view.findViewById(R.id.linearBibleDownload);
+        linearBibleDownload.setOnClickListener(this);
 
         dbAdapter = new BibleDBAdapter(getContext());
         dbAdapter.open();
@@ -280,12 +229,215 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
         getBibleData();
 
 
+        // 역본 사용 체크가 되어있다면
+        if(m_strIsReplace.equals("Y"))
+            ctBibleCompare.setChecked(true);
+        else
+            ctBibleCompare.setChecked(false);
+
+        init();
 
 
+        // 성경선택, 역본성경 선택 초기화 진행
+        if(m_strBibleVersion != null && m_strCompareBibleVersion != null)
+        {
+            ArrayList<ArrayList<String>> arrayListBibles = getBibleList();
+            ArrayList<String> arrayList_KOR = arrayListBibles.get(0);
+            ArrayList<String> arrayList_ENG = arrayListBibles.get(1);
+
+            if( arrayList_ENG.size() > 0 || arrayList_KOR.size() > 0) {
+                int nIndex_A = 0;
+                int nIndex_B = 0;
+                for (int i = 0; i < arrayList_ENG.size(); i++) {
+                    if (arrayList_ENG.get(i).equalsIgnoreCase(m_strBibleVersion)) {
+                        nIndex_A = i;
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < arrayList_ENG.size(); i++) {
+                    if (arrayList_ENG.get(i).equalsIgnoreCase(m_strCompareBibleVersion)) {
+                        nIndex_B = i;
+                        break;
+                    }
+                }
+
+                tvBibleList.setText(arrayList_KOR.get(nIndex_A));
+                tvCompareBibleList.setText(arrayList_KOR.get(nIndex_B));
+            }
+        }
         return m_view;
 
     }
 
+    // 디비에서 데이터 받고 난 이후의 작업들
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        m_tvTextSize.setText(m_strFontSize);
+        m_bartextsize.setProgress(Integer.parseInt(m_strFontSize));
+
+        // 역본 사용 체크가 되어있다면
+        if(m_strIsReplace.equals("Y"))
+            ctBibleCompare.setChecked(true);
+        else
+            ctBibleCompare.setChecked(false);
+
+        if (ctBibleCompare.isChecked())
+        {
+            linearCompareBible.setClickable(true);
+            tvCompareBible.setTextColor( ContextCompat.getColor(getContext(),R.color.colorBlack));
+            tvCompareBibleList.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray3));
+
+            dbAdapter.UpdateSettingIsReplace("Y");
+
+        }else
+        {
+            linearCompareBible.setClickable(false);
+            tvCompareBible.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray2));
+            tvCompareBibleList.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray1));
+            dbAdapter.UpdateSettingIsReplace("N");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //권한 허용 선택시
+                    //오레오부터 꼭 권한체크내에서 파일 만들어줘야함
+                    makeDir();
+                } else {
+                    //사용자가 권한 거절시
+                    denialDialog();
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+            // 성경선택 탭
+            case R.id.linearBibleSelect:
+
+                ArrayList<ArrayList<String>> arrayListBibles = getBibleList();
+                ArrayList<String> arrayList_KOR = arrayListBibles.get(0);
+                ArrayList<String> arrayList_ENG = arrayListBibles.get(1);
+
+                if( arrayList_ENG.size() > 0 || arrayList_KOR.size() > 0) {
+
+
+                    for (int i = 0; i < arrayList_ENG.size(); i++) {
+                        if (arrayList_ENG.get(i).equalsIgnoreCase(m_strBibleVersion)) {
+                            m_nSelectBible = i;
+                            break;
+                        }
+                    }
+
+                    final CharSequence[] oItemsKor = arrayList_KOR.toArray(new CharSequence[arrayList_KOR.size()]);
+                    final CharSequence[] oItemsEng = arrayList_ENG.toArray(new CharSequence[arrayList_ENG.size()]);
+
+
+                    AlertDialog.Builder oDialog = new AlertDialog.Builder(Objects.requireNonNull(getContext()), android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+
+                    oDialog.setTitle("읽을 성경을 선택해주세요").setSingleChoiceItems(oItemsKor, m_nSelectBible, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            m_nSelectBible = which;
+                        }
+                    }).setNeutralButton("선택", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            if (m_nSelectBible >= 0) {
+                                String strMsg = oItemsKor[m_nSelectBible] + "";
+
+                                tvBibleList.setText(strMsg);
+                                m_strBibleVersion = oItemsEng[m_nSelectBible] + "";
+
+                                dbAdapter.UpdateSettingVersion(oItemsEng[m_nSelectBible] + "");
+                            }
+                        }
+                    }).setCancelable(false).show();
+                }
+                break;
+            case R.id.linearCompareBibleSelect:
+
+                ArrayList<ArrayList<String>> arrayListBibles_02 = getBibleList();
+                ArrayList<String> arrayList_KOR_02 = arrayListBibles_02.get(0);
+                ArrayList<String> arrayList_ENG_02 = arrayListBibles_02.get(1);
+
+                if( arrayList_ENG_02.size() > 0 || arrayList_KOR_02.size() > 0) {
+
+
+                    for (int i = 0; i < arrayList_ENG_02.size(); i++) {
+                        if (arrayList_ENG_02.get(i).equalsIgnoreCase(m_strBibleVersion)) {
+                            arrayList_ENG_02.remove(i);
+                            arrayList_KOR_02.remove(i);
+                            break;
+                        }
+                    }
+
+                    final CharSequence[] oItemsKor_02 = arrayList_KOR_02.toArray(new CharSequence[arrayList_KOR_02.size()]);
+                    final CharSequence[] oItemsEng_02 = arrayList_ENG_02.toArray(new CharSequence[arrayList_ENG_02.size()]);
+
+
+                    AlertDialog.Builder oDialog_02 = new AlertDialog.Builder(Objects.requireNonNull(getContext()), android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+
+                    oDialog_02.setTitle("비교할 성경을 선택해주세요").setSingleChoiceItems(oItemsKor_02, m_nSelectBible, new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            m_nSelectBible = which;
+                        }
+                    }).setNeutralButton("선택", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            if (m_nSelectBible >= 0) {
+                                String strMsg = oItemsKor_02[m_nSelectBible] + "";
+
+                                tvCompareBibleList.setText(strMsg);
+                                m_strCompareBibleVersion = oItemsEng_02[m_nSelectBible] + "";
+
+                                dbAdapter.UpdateSettingReplaceVersion(oItemsEng_02[m_nSelectBible] + "");
+                            }
+                        }
+                    }).setCancelable(false).show();
+                }
+                break;
+            case R.id.linearBibleDownload:
+
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+                StartDownload();
+                break;
+            case R.id.linearBibleDelete:
+                break;
+
+
+
+        }
+    }
+
+
+    /*
+     * @ Func    : getBibleData()
+     * @ Param   : ~~~
+     * @ Since   : 2020.06.23
+     * @ Last    : 2020.06.23
+     * @ Author  : mhpark
+     * @ Context : DB에서 설정 관련된 데이터 받아오는 함수.
+     */
     private void getBibleData()
     {
 
@@ -349,13 +501,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
     }
 
-    private void StartDownload()
-    {
-        String url = "http://192.168.0.10/FileDownload/engnkjv.zip";
-        //String url = "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fk.kakaocdn.net%2Fdn%2Fb4LL01%2Fbtqv809t5X9%2FVY5qybXsG3TKsXbIiSD1KK%2Fimg.jpg";
-        new DownloadFileAsync(getContext()).execute(url,"1","1");
 
-    }
     final int PERMISSIONS_REQUEST_CODE = 1;
     private void requestPermission() {
         boolean shouldProviceRationale =
@@ -375,25 +521,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    //권한 허용 선택시
-                    //오레오부터 꼭 권한체크내에서 파일 만들어줘야함
-                    makeDir();
-                } else {
-                    //사용자가 권한 거절시
-                    denialDialog();
-                }
-                return;
-            }
-        }
-    }
+
 
     public void denialDialog() {
         new android.support.v7.app.AlertDialog.Builder(getActivity().getApplicationContext())
@@ -416,103 +544,23 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
     }
 
     public void makeDir() {
-        String root = getActivity().getFilesDir().getAbsolutePath(); //내장에 만든다
 
+        String root = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+ Util.m_strDirectory+File.separator;
 
-        String directoryName = "Downloads";
-        final File myDir = new File(root + "/" + directoryName);
+        final File myDir = new File(root);
         if (!myDir.exists()) {
             boolean wasSuccessful = myDir.mkdir();
             if (!wasSuccessful) {
                 System.out.println("file: was not successful.");
             } else {
-                System.out.println("file: 최초로 폴더만듦." + root + "/" + directoryName);
+                System.out.println("file: 최초로 폴더만듦." + root + "/" + Util.m_strDirectory);
             }
         } else {
-            System.out.println("file: " + root + "/" + directoryName +"already exists");
+            System.out.println("file: " + root + "/" + Util.m_strDirectory +"already exists");
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId())
-        {
-//            case R.id.btn1:
-//                dbAdapter.InsertSetting_DB("창세기","20","Y","korHKJV",
-//                        "engnkjv","15","Y","Y");
-//                dbAdapter.InsertUnderline_DB("창세기","01","20");
-//                break;
-//            case R.id.btn2:
-//                dbAdapter.DeleteTable(BibleDBAdapter.getDatabaseTableSetting());
-//                break;
-//            case R.id.btn3:
-//
-//                dbAdapter.CreateTableAll();
-//                break;
-//            case R.id.btn4:
-//
-//                ArrayList<String> array = dbAdapter.SelectSettingDB();
-//
-//                ArrayAdapter adapter = new ArrayAdapter(getContext(),android.R.layout.simple_list_item_1,array);
-//                lv.setAdapter(adapter);
-//
-//
-//
-//                break;
-//            case R.id.btn5:
-//                break;
-            case R.id.linearBibleSelect:
 
-                ArrayList<ArrayList<String>> arrayListBibles = getBibleList();
-                ArrayList<String> arrayList_KOR = arrayListBibles.get(0);
-                ArrayList<String> arrayList_ENG = arrayListBibles.get(1);
-
-                for(int i = 0; i < arrayList_ENG.size(); i++)
-                {
-                    if(arrayList_ENG.get(i).equalsIgnoreCase(m_strBibleVersion))
-                    {
-                        arrayList_ENG.remove(i);
-                        arrayList_KOR.remove(i);
-                        break;
-                    }
-                }
-
-                final  CharSequence[] oItemsKor = arrayList_KOR.toArray(new CharSequence[arrayList_KOR.size()]);
-                final  CharSequence[] oItemsEng = arrayList_ENG.toArray(new CharSequence[arrayList_ENG.size()]);
-
-
-                AlertDialog.Builder oDialog = new AlertDialog.Builder(getContext(), android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
-
-
-                oDialog.setTitle("읽을 성경을 선택해주세요").setSingleChoiceItems(oItemsKor, m_nSelectBible, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        m_nSelectBible = which;
-                    }
-                }).setNeutralButton("선택", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        if(m_nSelectBible > 0)
-                            tvBibleList.setText(oItemsEng[m_nSelectBible]);
-                    }
-                }).setCancelable(false).show();
-
-                break;
-            case R.id.linearCompareBibleSelect:
-
-                break;
-            case R.id.linearBibleDownload:
-                StartDownload();
-                break;
-            case R.id.linearBibleDelete:
-                break;
-
-
-
-        }
-    }
 
     private ArrayList<ArrayList<String>> getBibleList()
     {
@@ -526,21 +574,24 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
         String strPath;
         if(getActivity()!= null) {
-            strPath = getActivity().getFilesDir().getAbsolutePath() + File.separator + "Bibles" + File.separator;
+            strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Util.m_strDirectory+File.separator;
         }else
         {
             return arrayList;
         }
 
         File fbibles = new File(strPath);
-        File fbibleslist[] = fbibles.listFiles();
+        File[] fbibleslist = fbibles.listFiles();
 
+        assert fbibleslist != null;
         for(int i = 0; i < fbibleslist.length; i++)
         {
-            String strName= fbibleslist[i].getName();
-            int nIndex = strName.indexOf('.');
-            strName = strName.substring(0,nIndex);
-            arrayListCheck.add(strName);
+            if(fbibleslist[i].isFile()) {
+                String strName = fbibleslist[i].getName();
+                int nIndex = strName.indexOf('.');
+                strName = strName.substring(0, nIndex);
+                arrayListCheck.add(strName);
+            }
         }
 
         for(int i = 0; i < arrayListCheck.size(); i++)
@@ -560,12 +611,20 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
         return arrayList;
     }
 
-    class DownloadFileAsync extends AsyncTask<String, String, String> {
+
+    private void StartDownload()
+    {
+        String url = Util.m_strServerIP+"/FileDownload/engnkjv.zip";
+        new DownloadFileAsync(getContext()).execute(url,"1","1");
+
+    }
+
+    static class DownloadFileAsync extends AsyncTask<String, String, String> {
 
         private ProgressDialog mDlg;
         private Context mContext;
 
-        public DownloadFileAsync(Context context) {
+        DownloadFileAsync(Context context) {
             mContext = context;
         }
 
@@ -595,7 +654,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
                 int lenghtOfFile = conexion.getContentLength();
                 Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
 
-                String strPath = getActivity().getFilesDir().getAbsolutePath()+File.separator+"Downloads"+File.separator+"engnkjv.zip";
+                String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Util.m_strDirectory+File.separator+"engnkjv.cbk";
                 InputStream input = new BufferedInputStream(url.openStream());
                 OutputStream output = new FileOutputStream(strPath);
 
@@ -617,11 +676,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
                 // 작업이 진행되면서 호출하며 화면의 업그레이드를 담당하게 된다
                 //publishProgress("progress", 1, "Task " + 1 + " number");
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e){
+            } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
 
@@ -659,19 +714,29 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
         BibleReader bibleReader = new BibleReader();
 
 
-        List<String> dataVerse = new ArrayList<String>();
-        List<String> dataNumber = new ArrayList<String>();
+        List<String> dataVerse = new ArrayList<>();
+        List<String> dataNumber = new ArrayList<>();
 
-        ArrayList<String[]> arrayBible = new ArrayList<>();
-        Boolean bCompare = true;
+        ArrayList<String[]> arrayBible;
 
-        String strPath = getActivity().getFilesDir().getAbsolutePath()+File.separator+"Bibles"+File.separator;
+        boolean bCompare;
+        if( ctBibleCompare != null )
+        {
+            bCompare = ctBibleCompare.isChecked();
+        }else
+        {
+            bCompare = true;
+        }
+
+
+
+        String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Download"+File.separator;;
 
         // 성경 비교기능을 사용 할 것인지
         if( bCompare)
-            arrayBible =bibleReader.BibleParsing(strPath,"korHKJV","engnkjv","01","01");
+            arrayBible =bibleReader.BibleParsing(strPath,m_strBibleVersion,m_strCompareBibleVersion,"01","01");
         else
-            arrayBible =bibleReader.BibleParsing(strPath,"korHKJV","01","01");
+            arrayBible =bibleReader.BibleParsing(strPath,m_strBibleVersion, "01","01");
 
 
         if( arrayBible == null)
@@ -689,24 +754,12 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
         else
             mAdapter = new VerseRecyclerViewAdapter_Setting(getContext(), m_RecyclerView,false);
         m_RecyclerView.setAdapter(mAdapter);
+
+        mAdapter.setFontSize(Integer.parseInt(m_strFontSize) );
+
         mAdapter.setData(dataNumber,dataVerse);
-
-
         mAdapter.setData(dataNumber, dataVerse);
 
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 }
 
