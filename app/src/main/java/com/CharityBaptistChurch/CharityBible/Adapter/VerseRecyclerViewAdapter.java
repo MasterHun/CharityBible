@@ -2,7 +2,11 @@ package com.CharityBaptistChurch.CharityBible.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.text.LineBreaker;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -15,6 +19,8 @@ import android.widget.TextView;
 import com.CharityBaptistChurch.CharityBible.R;
 
 import java.util.List;
+
+import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
 // 참고 ->> https://thepassion.tistory.com/294
 
@@ -44,9 +50,8 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
     private  List<String> mdataVerse, mdataNumber;
     private RecyclerView recyclerView;
 
-
     private int m_nFontSize;
-    private boolean m_bCompare;             // true:성경비교x/false:성경비교o
+    private boolean m_bCompare;
 
     public VerseRecyclerViewAdapter(Context context
             , RecyclerView recyclerView
@@ -96,6 +101,7 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
         notifyDataSetChanged();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @NonNull
     @Override
     public StdViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -103,7 +109,7 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
         LayoutInflater inflate = LayoutInflater.from(mContext);
         View view = inflate.inflate(R.layout.verselist_item, parent, false);
 
-        return new StdViewHolder(view);
+        return new StdViewHolder(view, this.m_bCompare);
     }
 
     @Override
@@ -168,40 +174,58 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
         public TextView textVerse;
         public TextView textNumber;
 
-        public StdViewHolder(@NonNull View itemView) {
+        @RequiresApi(api = Build.VERSION_CODES.Q)
+        public StdViewHolder(@NonNull View itemView, final Boolean bReplace) {
 
             super(itemView);
             this.textVerse  = itemView.findViewById(R.id.text_verse);
             this.textNumber = itemView.findViewById(R.id.text_number);
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                this.textVerse.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+            }
+
             Log.d("Verse_Adapter","StdViewHolder");
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int pos= getAdapterPosition();
 
-                    int numA = Integer.parseInt( mdataNumber.get(pos).trim() );
-                    int numB = Integer.parseInt( mdataNumber.get(pos+1).trim() );
+                    int pos = getAdapterPosition();
 
-                    if( numA == numB )
+                    if(bReplace) {
+
+                        int nNunberOne = Integer.parseInt(mdataNumber.get(pos).trim());
+                        int nNumberTwo = Integer.parseInt(mdataNumber.get(pos + 1).trim());
+
+                        if (nNunberOne == nNumberTwo) {
+
+                            mListener.onItemSelected(v, getAdapterPosition());
+                            mListener.onItemSelected(v, getAdapterPosition() + 1);
+
+                            toggleItemSelected(pos);
+                            toggleItemSelected(pos + 1);
+
+                        } else if (nNunberOne < nNumberTwo) {
+
+                            mListener.onItemSelected(v, getAdapterPosition());
+                            mListener.onItemSelected(v, getAdapterPosition() - 1);
+                            toggleItemSelected(pos);
+                            toggleItemSelected(pos - 1);
+
+                        }
+                    }else
                     {
-                        mListener.onItemSelected(v, getAdapterPosition());
-                        mListener.onItemSelected(v, getAdapterPosition() + 1);
 
-                        toggleItemSelected(pos);
-                        toggleItemSelected(pos + 1);
+                        int nNumber= Integer.parseInt(mdataNumber.get(pos).trim());
 
-                    }else if( numA < numB )
-                    {
-                        mListener.onItemSelected(v, getAdapterPosition());
-                        mListener.onItemSelected(v, getAdapterPosition() - 1);
-                        toggleItemSelected(pos);
-                        toggleItemSelected(pos - 1);
+                        if (nNumber > 0) {
+
+                            mListener.onItemSelected(v, getAdapterPosition());
+                            toggleItemSelected(pos);
+
+                        }
 
                     }
-
-
-                    Log.d("test", "position = " + pos);
                 }
             });
 

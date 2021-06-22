@@ -100,7 +100,11 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
                     LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
                     m_list.setLayoutManager(layoutManager);
 
-                    m_Adapter = new VerseRecyclerViewAdapter(getContext(), m_list,Fragment_Search.this,Fragment_Search.this);
+                    boolean bIsReplace = false;
+                    if(m_strIsReplace.equals("Y"))
+                        bIsReplace = true;
+
+                    m_Adapter = new VerseRecyclerViewAdapter(getContext(), m_list,Fragment_Search.this,Fragment_Search.this, bIsReplace);
 
 
                    // m_searchtext = new SearchText(strText);

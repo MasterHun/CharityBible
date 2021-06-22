@@ -41,8 +41,8 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
     public RecyclerView m_RecyclerView;
 
-    private String m_strBibleVersion;
-    private String m_strContexts;
+    private String sBibleVersion;
+    private String sContexts;
     private String m_strChapter;
     private String m_strReplaceBibleVersion;
     private String m_strIsReplace;
@@ -50,14 +50,14 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     private String m_strIsBlackMode;
     private String m_strIsSleepMode;
 
-    private ArrayList<Integer> m_ClickVerse;
+    private ArrayList<Integer> arrayClickVerse;
 
     public String getM_strBibleVersion() {
-        return m_strBibleVersion;
+        return sBibleVersion;
     }
 
     public String getM_strContexts() {
-        return m_strContexts;
+        return sContexts;
     }
 
     public String getM_strChapter() {
@@ -71,8 +71,8 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
     public Fragment_ReadBible()
     {
-        m_strBibleVersion = "korHKJV";    // 어떤 종류의 성경인지    ex)
-        m_strContexts = "창세기";          // 어떤 권인지            ex) 창세기, 요한복음
+        sBibleVersion = "korHKJV";    // 어떤 종류의 성경인지    ex)
+        sContexts = "창세기";          // 어떤 권인지            ex) 창세기, 요한복음
         m_strChapter = "01";              // 성경 몇번째 장인지      ex) 10장이면 10, 3장이면 03
     }
 
@@ -95,8 +95,8 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
         // 성경이 존재하는지에 대한 체크
         if(isBibleChecker()) {
-            if (!(m_strContexts.equals("") && m_strChapter.equals(""))) {
-                init(m_strContexts, m_strChapter);
+            if (!(sContexts.equals("") && m_strChapter.equals(""))) {
+                init(sContexts, m_strChapter);
             }
         }
         else
@@ -109,7 +109,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
 
-        m_ClickVerse = new ArrayList();
+        arrayClickVerse = new ArrayList();
 
         Log.d("TestLog","ReadBible-onCreateView");
         Log.d("hun", "Fragment_ReadBible::onCreateView()");
@@ -136,7 +136,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
                 int nIndex = strChapter.indexOf("장");
 
                 m_strChapter = strChapter.substring(0, nIndex);
-                m_strContexts = strContents;
+                sContexts = strContents;
             }
 
         }
@@ -179,7 +179,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
             switch (i)
             {
                 case 0:
-                    m_strContexts = strResult;
+                    sContexts = strResult;
                     break;
                 case 1:
                     m_strChapter= strResult;
@@ -188,7 +188,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
                     m_strIsReplace = strResult;
                     break;
                 case 3:
-                    m_strBibleVersion = strResult;
+                    sBibleVersion = strResult;
                     break;
                 case 4:
                     m_strReplaceBibleVersion = strResult;
@@ -213,15 +213,15 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
             i++;
         }
 
-        String strLog = m_strContexts+","+m_strChapter+","+m_strIsReplace+","+m_strBibleVersion+","+m_strReplaceBibleVersion+","+m_strFontSize
+        String strLog = sContexts+","+m_strChapter+","+m_strIsReplace+","+sBibleVersion+","+m_strReplaceBibleVersion+","+m_strFontSize
                 +","+m_strIsBlackMode+","+m_strIsSleepMode;
         Log.d("mhpark","Result:"+strLog);
 
         if(getActivity() != null) {
             ((MainActivity) getActivity()).setChapter(m_strChapter);
-            ((MainActivity) getActivity()).setContents(m_strContexts);
+            ((MainActivity) getActivity()).setContents(sContexts);
             ((MainActivity) getActivity()).setBtnChapter(m_strChapter);
-            ((MainActivity) getActivity()).setBtnContents(m_strContexts);
+            ((MainActivity) getActivity()).setBtnContents(sContexts);
         }
 
     }
@@ -302,9 +302,9 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
         // 4. 성경 비교기능을 사용 할 것인지
         if( m_strIsReplace.equals("Y"))
-            arrayBible =bibleReader.BibleParsing(strBiblesPath, m_strBibleVersion, m_strReplaceBibleVersion, strContentsIndex, strChapter);
+            arrayBible =bibleReader.BibleParsing(strBiblesPath, sBibleVersion, m_strReplaceBibleVersion, strContentsIndex, strChapter);
         else
-            arrayBible =bibleReader.BibleParsing(strBiblesPath, m_strBibleVersion, strContentsIndex, strChapter);
+            arrayBible =bibleReader.BibleParsing(strBiblesPath, sBibleVersion, strContentsIndex, strChapter);
 
         if(arrayBible == null) {
             Log.d("mhpark","init() BibleParsing Failed");
@@ -365,42 +365,60 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     public void onItemLongSelected(View v, int position) {
 
 
-        String str="";
 
-        int nSize = m_ClickVerse.size();
-        Collections.sort(m_ClickVerse); /// 오름차순
+
+        String sData="";
+
+        int nSize = arrayClickVerse.size();
+        Collections.sort(arrayClickVerse); /// 오름차순 정렬
 
         if(nSize > 0)
         {
             for(int i = 0; i < nSize ; i++)
             {
-                int nPos = m_ClickVerse.get(i);
-                str = str + m_strBibleVersion + " " + m_strContexts + " " + m_strChapter;
+                int nPos = arrayClickVerse.get(i);
+                sData = sData + sBibleVersion + " " + sContexts + " " + m_strChapter;
 
-                VerseRecyclerViewAdapter.StdViewHolder viewHolderA = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos);
-                VerseRecyclerViewAdapter.StdViewHolder viewHolderB = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos+1);
-
-                VerseRecyclerViewAdapter.StdViewHolder viewHolderC;
-
-
-
-                int numA = Integer.parseInt( viewHolderA.textNumber.getText().toString().trim() );
-                int numB = Integer.parseInt( viewHolderB.textNumber.getText().toString().trim() );
-
-
-                if( numA == numB )
+                if( m_strIsReplace.equals("Y"))
                 {
-                    str = str +  ":"+numA + "\n";
-                    str += viewHolderA.textVerse.getText().toString() + "\n" + viewHolderB.textVerse.getText().toString();
-                }
-                else if(numA < numB)
+                    VerseRecyclerViewAdapter.StdViewHolder vhReplaceOne = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos);
+                    VerseRecyclerViewAdapter.StdViewHolder vhReplaceTwo = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos+1);
+
+                    if( vhReplaceOne != null && vhReplaceTwo != null) {
+                        int nNumberOne = Integer.parseInt(vhReplaceOne.textNumber.getText().toString().trim());
+                        int nNumberTwo = Integer.parseInt(vhReplaceTwo.textNumber.getText().toString().trim());
+
+                        if (nNumberOne == nNumberTwo) {
+                            sData = sData + ":" + nNumberOne + "\n";
+                            sData += vhReplaceOne.textVerse.getText().toString() + "\n" + vhReplaceTwo.textVerse.getText().toString();
+                        } else if (nNumberOne < nNumberTwo) {
+                            sData = sData + ":" + nNumberOne + "\n";
+                            VerseRecyclerViewAdapter.StdViewHolder vhReplaceTemp;
+                            vhReplaceTemp = (VerseRecyclerViewAdapter.StdViewHolder) m_RecyclerView.findViewHolderForAdapterPosition(nPos - 1);
+
+                            if(vhReplaceTemp != null)
+                                sData += vhReplaceTemp.textVerse.getText().toString() + "\n" + vhReplaceOne.textVerse.getText().toString();
+                        }
+
+                        sData += "\n";
+                    }
+                }else
                 {
-                    str = str +  ":"+ numA + "\n";
-                    viewHolderC = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos-1);
-                    str += viewHolderC.textVerse.getText().toString() + "\n" + viewHolderA.textVerse.getText().toString();
+                    VerseRecyclerViewAdapter.StdViewHolder vhReplace = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos);
+
+                    if( vhReplace != null) {
+                        int nNumberOne = Integer.parseInt(vhReplace.textNumber.getText().toString().trim());
+
+                        if (nNumberOne > 0) {
+                            sData = sData + ":" + nNumberOne + "\n";
+                            sData += vhReplace.textVerse.getText().toString();
+                        }
+
+                        sData += "\n";
+                    }
+
                 }
 
-                str += "\n";
 
                 i++;
             }
@@ -411,10 +429,9 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         msg.addCategory(Intent.CATEGORY_DEFAULT);
 
         msg.putExtra(Intent.EXTRA_SUBJECT, "주제");
-
         //msg.putExtra(Intent.EXTRA_TEXT, "내용");
-        Log.d("test","[hun]"+str);
-        msg.putExtra(Intent.EXTRA_TEXT, str);
+       // Log.d("test","[hun]"+ sData);
+        msg.putExtra(Intent.EXTRA_TEXT, sData);
 
         msg.putExtra(Intent.EXTRA_TITLE, "제목");
 
@@ -430,22 +447,23 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         VerseRecyclerViewAdapter.StdViewHolder viewHolder = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(position);
         if( viewHolder != null)
         {
-            int nSize = m_ClickVerse.size();
+            int nSize = arrayClickVerse.size();
             if(nSize > 0) {
                 for (int i = 0; i < nSize; i++) {
-                    if (m_ClickVerse.get(i) == position) {
-                        m_ClickVerse.remove(i);
+
+                    if (arrayClickVerse.get(i) == position) {
+                        arrayClickVerse.remove(i);
                         break;
                     }
 
                     if( i + 1 == nSize ) {
-                        m_ClickVerse.add(position);
+                        arrayClickVerse.add(position);
                         break;
                     }
                 }
             }else
             {
-                m_ClickVerse.add(position);
+                arrayClickVerse.add(position);
             }
         }
     }

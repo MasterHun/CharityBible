@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
     Fragment_ReadBible m_fragmentReadBible;
 
+    private ArrayList<String> arrayBibleList;
+
     private String m_strBibleVersion;           //
     private String m_strContexts;
     private String m_strChapter;
@@ -135,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         // *권한 체크하기
         checkVerify();
+
+        // *보유중인 성경 가져오
+        arrayBibleList = getBibleList();
+
 
         // *다운로드 체크
         DownLoadChecker();
@@ -667,15 +673,45 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
             case R.id.BTN_selectbible:
 
+                //versions_eng_new
 
-                final CharSequence[] oItemsA = { "킹제임스 흠정역(HKJV)", "개역개정(NKRV)","쉬운성경(Easy)" };
-                final CharSequence[] oItemsB = { "HKJV", "NKRV","Easy" };
 
+
+                List<String> listBibleKor = new ArrayList<String>();
+                List<String> listBibleEng = new ArrayList<String>();
+
+                final String[] sEngBibleList = getResources().getStringArray(R.array.versions_eng_new);
+                final String[] sKorBibleList = getResources().getStringArray(R.array.versions_kor_new);
+                for(int i = 0; arrayBibleList.size() > i; i++)
+                {
+                    String sBibleName = arrayBibleList.get(i);
+                    if(sBibleName.contains(".cbk"))
+                    {
+                        int nBibleNameLength = sBibleName.length();
+                        String sBible = sBibleName.substring(0, nBibleNameLength-4);
+
+                        for(int j = 0; sEngBibleList.length > j; j++)
+                        {
+                            if( sEngBibleList[j].equalsIgnoreCase(sBible))
+                            {
+                                listBibleEng.add(sEngBibleList[j]);
+                                listBibleKor.add(sKorBibleList[j]);
+                                break;
+                            }
+
+                        }
+
+                    }
+
+                }
+
+                final CharSequence[] oItemsEng = listBibleEng.toArray(new CharSequence[listBibleEng.size()]);
+                final CharSequence[] oItemsKor = listBibleKor.toArray(new CharSequence[listBibleKor.size()]);
 
                 AlertDialog.Builder oDialog = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
 
 
-                oDialog.setTitle("읽을 성경을 선택해주세요").setSingleChoiceItems(oItemsA, m_nSelectItem, new DialogInterface.OnClickListener() {
+                oDialog.setTitle("읽을 성경을 선택해주세요").setSingleChoiceItems(oItemsKor, m_nSelectItem, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -686,47 +722,47 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     public void onClick(DialogInterface dialog, int which) {
 
                         if(m_nSelectItem > 0)
-                            m_Btn_SelectBible.setText(oItemsB[m_nSelectItem]);
+                            m_Btn_SelectBible.setText(oItemsEng[m_nSelectItem]);
                     }
                 }).setCancelable(false).show();
 
-
                 break;
-
 
             case R.id.IB_sound:
 
-                if(m_bSound) {    // 사운드 버튼 Off
+                Toast.makeText(this, "해당기능은 준비중입니다.",Toast.LENGTH_SHORT).show();
+                if(false) {
+                    if (m_bSound) {    // 사운드 버튼 Off
 
-                    m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
-                    m_bSound = false;
+                        m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
+                        m_bSound = false;
 
-                    m_ImgBtn_Sound.setSelected(false);
+                        m_ImgBtn_Sound.setSelected(false);
 
-                    m_FABtn_NextChapter.animate().translationY(0).start();
-                    m_FABtn_PreviousChapter.animate().translationY(0).start();
+                        m_FABtn_NextChapter.animate().translationY(0).start();
+                        m_FABtn_PreviousChapter.animate().translationY(0).start();
 
-                    if(m_mp != null) {
-                        m_mp.clearMediaPlayer();
-                        m_mp = null;
-                    }
-                }
-                else {          // 사운드 버튼 On
-                    m_Linear_Miniplayer.setVisibility(View.VISIBLE);
-                    m_bSound = true;
+                        if (m_mp != null) {
+                            m_mp.clearMediaPlayer();
+                            m_mp = null;
+                        }
+                    } else {          // 사운드 버튼 On
+                        m_Linear_Miniplayer.setVisibility(View.VISIBLE);
+                        m_bSound = true;
 
-                    m_ImgBtn_Sound.setSelected(true);
+                        m_ImgBtn_Sound.setSelected(true);
 
-                    m_FABtn_NextChapter.animate().translationY(-180).start();
-                    m_FABtn_PreviousChapter.animate().translationY(-180).start();
+                        m_FABtn_NextChapter.animate().translationY(-180).start();
+                        m_FABtn_PreviousChapter.animate().translationY(-180).start();
 
-                    String strSoundPath = Environment.getExternalStorageDirectory()+File.separator+Util.m_strDirectory+File.separator+"BibleSound";
-                    if(m_mp == null) {
-                        m_mp = new MusicPlayer(strSoundPath);
-                        m_mp.initMusic(
-                                m_fragmentReadBible.getM_strBibleVersion(),
-                                m_fragmentReadBible.getM_strContexts(),
-                                Integer.parseInt(m_fragmentReadBible.getM_strChapter()) );
+                        String strSoundPath = Environment.getExternalStorageDirectory() + File.separator + Util.m_strDirectory + File.separator + "BibleSound";
+                        if (m_mp == null) {
+                            m_mp = new MusicPlayer(strSoundPath);
+                            m_mp.initMusic(
+                                    m_fragmentReadBible.getM_strBibleVersion(),
+                                    m_fragmentReadBible.getM_strContexts(),
+                                    Integer.parseInt(m_fragmentReadBible.getM_strChapter()));
+                        }
                     }
                 }
                 break;
@@ -862,35 +898,35 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
                 arrayList.add(filelist[i].getName());
 
-                try {
-
-                    String strName = filelist[i].getName();
-                    int nIndex = strName.indexOf('.');
-                    strName = strName.substring(0,nIndex);
-
-
-                    ZipFile zip = new ZipFile(filelist[i].getAbsoluteFile(), ZipFile.OPEN_READ);
-
-                    int nSize = zip.size();
-
-                    String strFile = strName+"01_01"+".lfb";
-                    ZipEntry entry = zip.getEntry(strFile);
-                    InputStream inputStream = zip.getInputStream(entry);
-
-                    Scanner sc = new Scanner(inputStream);
-                    while(sc.hasNext())
-                    {
-                        arrayList.add(sc.nextLine());
-                    }
-
-
-
-                    zip.close();
-
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
+//                try {
+//
+//                    String strName = filelist[i].getName();
+//                    int nIndex = strName.indexOf('.');
+//                    strName = strName.substring(0,nIndex);
+//
+//
+//                    ZipFile zip = new ZipFile(filelist[i].getAbsoluteFile(), ZipFile.OPEN_READ);
+//
+//                    int nSize = zip.size();
+//
+//                    String strFile = strName+"01_01"+".lfb";
+//                    ZipEntry entry = zip.getEntry(strFile);
+//                    InputStream inputStream = zip.getInputStream(entry);
+//
+//                    Scanner sc = new Scanner(inputStream);
+//                    while(sc.hasNext())
+//                    {
+//                        arrayList.add(sc.nextLine());
+//                    }
+//
+//
+//
+//                    zip.close();
+//
+//                } catch (IOException e)
+//                {
+//                    e.printStackTrace();
+//                }
             }
 
         }
@@ -950,8 +986,8 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
     private void DownLoadChecker()
     {
-        ArrayList<String> arrayBible = getBibleList();
-        if(arrayBible.size() == 0) {
+
+        if(arrayBibleList.size() == 0) {
 
                 //String url = "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fk.kakaocdn.net%2Fdn%2Fb4LL01%2Fbtqv809t5X9%2FVY5qybXsG3TKsXbIiSD1KK%2Fimg.jpg";
             DownloadFileAsync df = new DownloadFileAsync(this);
