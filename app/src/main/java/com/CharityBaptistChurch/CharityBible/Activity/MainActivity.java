@@ -117,19 +117,16 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        Log.d("TestLog","MainActivity-OnCreate()");
-        Log.d("MainActivity","OnCreate()");
-
         // *로딩이미지 호출
-
         if(!m_bLoadingImg) {
             Intent intent = new Intent(this, LoadingActivity.class);
             startActivity(intent);
             m_bLoadingImg = true;
         }
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+
         // *액션바 숨기기
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
@@ -143,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
 
         // *다운로드 체크
-        DownLoadChecker();
+        //DownLoadChecker();
 
         ImageButton iBtn_NextSound = findViewById(R.id.IB_next);        // 다음 음성파일 재생 변수선언
         iBtn_NextSound.setOnClickListener(this);
@@ -156,14 +153,14 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         m_fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
 
-        //*sNavigationDrawer 선언 및 사
+        //*sNavigationDrawer 선언 및 사용
         sNavigationDrawer = findViewById(R.id.navigationDrawer);
         List<MenuItem> menuItems = new ArrayList<>();
         menuItems.add(new MenuItem("성경읽기(Read)",R.drawable.news_bg));
         menuItems.add(new MenuItem("구절검색(Search)",R.drawable.feed_bg));
         menuItems.add(new MenuItem("유튜브(Youtube)",R.drawable.message_bg));
         menuItems.add(new MenuItem("설정(Setting)",R.drawable.music_bg));
-        //menuItems.add(new MenuItem("설정(Setting)",R.drawable.music_bg));
+
         sNavigationDrawer.setMenuItemList(menuItems);
         sNavigationDrawer.setAppbarTitleTV("성경읽기(Read)");
 
@@ -348,17 +345,8 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d("TestLog","MainActivity-onStart");
         Log.d("MainActivity","OnStart()");
-
-    //    fm = getSupportFragmentManager();
-     //   fragtran = fm.beginTransaction();
-     //   fragtran.commit();
-
     }
-
-
-
 
     public void setBtnContents(String a_strContents) {
         if(a_strContents.isEmpty())
@@ -465,10 +453,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         if(file.isDirectory())
         {
-            Log.d("DownloadChecker","폴더가 존재한다.");
+            Log.d("MainActivity","DownloadChecker() >> 폴더가 존재한다.");
         }else
         {
-            Log.d("DownloadChecker","폴더가 없음");
+            Log.d("MainActivity","DownloadChecker() >> 폴더가 없음");
        }
 
         File[] files = file.listFiles();
@@ -483,21 +471,18 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     protected void onResume() {
         super.onResume();
 
-        Log.d("TestLog","MainActivity-OnResume()");
+        Log.d("MainActivity","OnResume()");
 
         String strChapter;
         String strContents;
         int nChapter = 0;
 
-        Log.d("MainActivity","OnResume()");
-
-
         Intent intent = getIntent();
         if( intent.getExtras() != null ) {
-            Log.d("MainActivity","intent 값받아옴");
+            Log.d("MainActivity","OnResume() >> intent 값받아옴");
             strChapter = intent.getStringExtra("Chapter");      // 성경 장
             strContents = intent.getStringExtra("Contents");     // 성경 전서
-            Log.d("MainActivity",strContents+":"+strChapter);
+            Log.d("MainActivity","OnResume() >> "+strContents+":"+strChapter);
 
             if( strChapter != null) {
                 nChapter = Integer.parseInt(strChapter);
@@ -506,7 +491,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             if( nChapter > 0)
             {
                 m_strChapter = strChapter;
-                Log.d("MainActivity","찍힘 Here");
                 Toast.makeText(getApplicationContext(), strContents,Toast.LENGTH_SHORT).show();
             }
 
@@ -534,7 +518,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("TestLog","MainActivity-OnPause()");
         Log.d("MainActivity","OnPause()");
     }
 
@@ -544,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
 
         // 다운로드된 파일이 있는지 체크
-        DownloadChecker();
+     //   DownloadChecker();
 
         String[] strBibleContents = getResources().getStringArray(R.array.KOR);
         String[] strBibleMaxLen = getResources().getStringArray(R.array.KOR_LEN);
@@ -759,9 +742,9 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                         if (m_mp == null) {
                             m_mp = new MusicPlayer(strSoundPath);
                             m_mp.initMusic(
-                                    m_fragmentReadBible.getM_strBibleVersion(),
-                                    m_fragmentReadBible.getM_strContexts(),
-                                    Integer.parseInt(m_fragmentReadBible.getM_strChapter()));
+                                    m_fragmentReadBible.getBibleVersion(),
+                                    m_fragmentReadBible.getContexts(),
+                                    Integer.parseInt(m_fragmentReadBible.getChapter()));
                         }
                     }
                 }
@@ -886,7 +869,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         //String strPath = getFilesDir().getAbsolutePath() + File.separator + "Bibles" + File.separator;
         String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Util.m_strDirectory+File.separator;
-        Log.d("hun ", "MainActivity::getBibleList Path[" + strPath + "]");
+        Log.d("MainActivity ", "getBibleList() >> Path[" + strPath + "]");
         File file = new File(strPath);
         File[] filelist = file.listFiles();
 
@@ -1035,7 +1018,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     conexion.connect();
 
                     int lenghtOfFile = conexion.getContentLength();
-                    Log.d("ANDRO_ASYNC", "Lenght of file: " + lenghtOfFile);
+                    Log.d("MainActivity", "getBibleList() >> Lenght of file: " + lenghtOfFile);
 
                     int nIndex = array.get(i).indexOf(".cbk");
                     nIndex = array.get(i).lastIndexOf("/", nIndex);

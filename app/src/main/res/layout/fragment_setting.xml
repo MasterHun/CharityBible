@@ -13,7 +13,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv"
             android:layout_width="match_parent"
-            android:layout_height="200dp">
+            android:layout_height="300dp">
 
 
         </android.support.v7.widget.RecyclerView>
@@ -135,74 +135,74 @@
         </LinearLayout>
 
 
-        <TextView
-            android:id="@+id/header3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="#eeeeee"
-            android:text="성경 데이터 관리"
-            android:textSize="15sp"
-            android:textStyle="bold" />
+<!--        <TextView-->
+<!--            android:id="@+id/header3"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            android:background="#eeeeee"-->
+<!--            android:text="성경 데이터 관리"-->
+<!--            android:textSize="15sp"-->
+<!--            android:textStyle="bold" />-->
 
-        <LinearLayout
-            android:id="@+id/linearBibleDownload"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:orientation="vertical">
+<!--        <LinearLayout-->
+<!--            android:id="@+id/linearBibleDownload"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?android:attr/selectableItemBackground"-->
+<!--            android:clickable="true"-->
+<!--            android:focusable="true"-->
+<!--            android:orientation="vertical">-->
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="성경다운로드"
-                android:id="@+id/tvBibleDownload"
-                android:textColor="@color/Black"
-                android:textSize="16sp" />
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginLeft="5dp"-->
+<!--                android:text="성경다운로드"-->
+<!--                android:id="@+id/tvBibleDownload"-->
+<!--                android:textColor="@color/Black"-->
+<!--                android:textSize="16sp" />-->
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tvBibleDownloadList"
-                android:textColor="@color/colorGray3"
-                android:layout_marginLeft="5dp"
-                android:text="인터넷을 통해서 성경을 다운로드 합니다." />
-        </LinearLayout>
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/tvBibleDownloadList"-->
+<!--                android:textColor="@color/colorGray3"-->
+<!--                android:layout_marginLeft="5dp"-->
+<!--                android:text="인터넷을 통해서 성경을 다운로드 합니다." />-->
+<!--        </LinearLayout>-->
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@color/thumbColor" />
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="1dp"-->
+<!--            android:layout_marginTop="5dp"-->
+<!--            android:layout_marginBottom="5dp"-->
+<!--            android:background="@color/thumbColor" />-->
 
-        <LinearLayout
-            android:id="@+id/linearBibleDelete"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:orientation="vertical"
-            android:focusable="true">
+<!--        <LinearLayout-->
+<!--            android:id="@+id/linearBibleDelete"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?android:attr/selectableItemBackground"-->
+<!--            android:clickable="true"-->
+<!--            android:orientation="vertical"-->
+<!--            android:focusable="true">-->
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="성경 삭제"
-                android:textColor="@color/Black"
-                android:textSize="16sp" />
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="5dp"-->
+<!--                android:text="성경 삭제"-->
+<!--                android:textColor="@color/Black"-->
+<!--                android:textSize="16sp" />-->
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:textColor="@color/colorGray3"
-                android:text="디바이스에 있는 성경을 삭제합니다." />
-        </LinearLayout>
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="5dp"-->
+<!--                android:textColor="@color/colorGray3"-->
+<!--                android:text="디바이스에 있는 성경을 삭제합니다." />-->
+<!--        </LinearLayout>-->
 
         <!--<Button-->
             <!--android:id="@+id/btn_filedownload"-->

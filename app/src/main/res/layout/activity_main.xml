@@ -52,11 +52,11 @@
 
             <ImageButton
                 android:id="@+id/IB_sound"
-                android:layout_width="20dp"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="1dp"
                 android:layout_marginRight="1dp"
-                android:layout_weight="0.5"
+                android:layout_weight="0"
                 android:background="@drawable/selector_volume"
                 android:contentDescription="TODO" />
         </LinearLayout>

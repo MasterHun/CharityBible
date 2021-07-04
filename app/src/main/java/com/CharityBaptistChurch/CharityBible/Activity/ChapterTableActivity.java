@@ -75,19 +75,15 @@ public class ChapterTableActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                 int nBibleSelectedChapter = Integer.parseInt(strBibleSelectedChapter);
 
                 if( nBibleSelectedChapter > 0 &&  strBibleContents != null ) {
-
-                    Log.d("ChapterTable", "ChapterTableActivity onClickListener");
                     intent.putExtra("Chapter", strBibleSelectedChapter);
                     intent.putExtra("Contents", strBibleContents);
                     startActivity(intent);
 
                 }
-                //finish();
             }
         };
 
@@ -115,10 +111,9 @@ public class ChapterTableActivity extends AppCompatActivity {
                 final Button tb = new Button(this);
                 tb.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.buttonshape));
                 tb.setOnClickListener(onClickListener);
-                tb.setText("" + nCount);
+                tb.setText(""+nCount);
                 tb.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
                 tableRow.addView(tb);
-                int n = tb.getId();
                 nCount++;
             }
             tableRow.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT, TableLayout.LayoutParams.WRAP_CONTENT));
@@ -133,7 +128,7 @@ public class ChapterTableActivity extends AppCompatActivity {
                 final Button tb = new Button(this);
                 tb.setBackground(ContextCompat.getDrawable(getBaseContext(),R.drawable.buttonshape));
                 tb.setOnClickListener(onClickListener);
-                tb.setText("" + nCount);
+                tb.setText(""+nCount);
                 tb.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
                 tableRow.addView(tb);
                 nCount++;

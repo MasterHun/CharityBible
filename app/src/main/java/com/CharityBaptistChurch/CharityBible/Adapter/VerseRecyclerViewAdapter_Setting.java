@@ -2,7 +2,10 @@ package com.CharityBaptistChurch.CharityBible.Adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.text.LineBreaker;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -140,16 +143,21 @@ public class VerseRecyclerViewAdapter_Setting extends RecyclerView.Adapter<Verse
         return mSelectedItems.get(position, false);
     }
 
+
     static class StdViewHolder extends RecyclerView.ViewHolder {
         TextView textVerse;
         TextView textNumber;
 
+        @RequiresApi(api = Build.VERSION_CODES.Q)
         StdViewHolder(@NonNull View itemView) {
-
             super(itemView);
+
             this.textVerse= itemView.findViewById(R.id.text_verse);
             this.textNumber= itemView.findViewById(R.id.text_number);
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                this.textVerse.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+            }
             Log.d("Verse_Adapter","StdViewHolder");
         }
     }

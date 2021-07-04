@@ -31,12 +31,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.CharityBaptistChurch.CharityBible.Adapter.BibleDBAdapter;
+import com.CharityBaptistChurch.CharityBible.Adapter.VerseRecyclerViewAdapter;
 import com.CharityBaptistChurch.CharityBible.Adapter.VerseRecyclerViewAdapter_Setting;
 import com.CharityBaptistChurch.CharityBible.BibleReader;
 import com.CharityBaptistChurch.CharityBible.FileDownload;
+import com.CharityBaptistChurch.CharityBible.JsonBible;
 import com.CharityBaptistChurch.CharityBible.R;
 import com.CharityBaptistChurch.CharityBible.Util;
 import com.willowtreeapps.spruce.BuildConfig;
+
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -56,21 +60,14 @@ import static android.support.v4.content.PermissionChecker.checkSelfPermission;
 
 public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
-    Button m_btnFileDownload;
 
     TextView m_tvTextSize;
 
-    String m_SavePath;
-    String m_FileName;
     //   VerseRecyclerViewAdapter mAdapter;
     FileDownload.DownloadThread dThread;
 
     public final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     public final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
-
-//    Button btn1, btn2, btn3, btn4, btn5;
-//    ListView lv;
-
 
     private String m_strBibleVersion;
     private String m_strContexts;
@@ -91,7 +88,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
     CheckedTextView ctBibleCompare;
 
-    LinearLayout linearBible, linearCompareBible, linearBibleDownload;
+    LinearLayout linearBible, linearCompareBible;
     TextView tvBible,tvBibleList,tvCompareBible, tvCompareBibleList;
 
     private static int m_nSelectBible = -1;
@@ -219,10 +216,6 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
             }
         });
 
-
-        linearBibleDownload = m_view.findViewById(R.id.linearBibleDownload);
-        linearBibleDownload.setOnClickListener(this);
-
         dbAdapter = new BibleDBAdapter(getContext());
         dbAdapter.open();
 
@@ -234,8 +227,6 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
             ctBibleCompare.setChecked(true);
         else
             ctBibleCompare.setChecked(false);
-
-        init();
 
 
         // 성경선택, 역본성경 선택 초기화 진행
@@ -275,6 +266,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
     public void onStart() {
         super.onStart();
 
+        init();
         m_tvTextSize.setText(m_strFontSize);
         m_bartextsize.setProgress(Integer.parseInt(m_strFontSize));
 
@@ -292,12 +284,16 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
 
             dbAdapter.UpdateSettingIsReplace("Y");
 
+            m_strIsReplace = "Y";
+
         }else
         {
             linearCompareBible.setClickable(false);
             tvCompareBible.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray2));
             tvCompareBibleList.setTextColor( ContextCompat.getColor(getContext(),R.color.colorGray1));
             dbAdapter.UpdateSettingIsReplace("N");
+
+            m_strIsReplace = "N";
         }
     }
 
@@ -415,16 +411,6 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
                     }).setCancelable(false).show();
                 }
                 break;
-            case R.id.linearBibleDownload:
-
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-
-                StartDownload();
-                break;
-            case R.id.linearBibleDelete:
-                break;
-
-
 
         }
     }
@@ -658,7 +644,7 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
                 InputStream input = new BufferedInputStream(url.openStream());
                 OutputStream output = new FileOutputStream(strPath);
 
-                byte data[] = new byte[1024];
+                byte[] data = new byte[1024];
 
                 long total = 0;
 
@@ -708,57 +694,103 @@ public class Fragment_Setting  extends Fragment implements View.OnClickListener{
     void init() {
 
 
+        ArrayList<String[]> arrayJsonBible = new ArrayList();
+        try {
+
+            if(m_strIsReplace.equals("Y") && ctBibleCompare.isChecked() ) {
+
+                String line = JsonBible.getInstance().getBibleJsonData();
+
+                String lineReplace = JsonBible.getInstance().getBibleJsonDataReplace();
+
+                JSONObject jsonObject = new JSONObject(line);
+                JSONObject jsonObjectReplace = new JSONObject(lineReplace);
+
+                String[] sBibleArray = getResources().getStringArray(R.array.KOR_ACM);
+
+                int i = 1;
+                while (true) {
+                    String str = sBibleArray[0] + 1 + ":" + i;
+                    String strLine = jsonObject.getString(str);
+
+                    String strReplace = sBibleArray[0] + 1 + ":" + i;
+                    String strLineReplace = jsonObjectReplace.getString(strReplace);
+
+                    if(strLine.isEmpty() || strLineReplace.isEmpty())
+                        break;
+
+
+                    if( i < 10) {
+                        arrayJsonBible.add(new String[]{"0" + i + " ", strLine});
+                        arrayJsonBible.add(new String[]{"0" + i + " ", strLineReplace});
+                    }else
+                    {
+                        arrayJsonBible.add(new String[]{ i +" ", strLine});
+                        arrayJsonBible.add(new String[]{ i +" ", strLineReplace});
+                    }
+
+                    i++;
+                    //jsonObject.getString("계10:1");
+                }
+            }
+            else {
+                String line = JsonBible.getInstance().getBibleJsonData();
+                JSONObject jsonObject = new JSONObject(line);
+                String[] sBibleArray = getResources().getStringArray(R.array.KOR_ACM);
+
+                int i = 1;
+                while (true) {
+                    String str = sBibleArray[0] + 1 + ":" + i;
+                    String strLine = jsonObject.getString(str);
+
+                    if (strLine.isEmpty())
+                        break;
+
+                    if (i < 10) {
+                        arrayJsonBible.add(new String[]{"0" + i + " ", strLine});
+                    } else {
+                        arrayJsonBible.add(new String[]{Integer.toString(i), strLine});
+                    }
+                    i++;
+                }
+            }
+        }catch (Exception io)
+        {
+            io.printStackTrace();
+        }
+
         final VerseRecyclerViewAdapter_Setting mAdapter;
 
-
-        BibleReader bibleReader = new BibleReader();
-
-
-        List<String> dataVerse = new ArrayList<>();
+        List<String> dataVerse  = new ArrayList<>();
         List<String> dataNumber = new ArrayList<>();
 
-        ArrayList<String[]> arrayBible;
+        for (int i = 0; i < arrayJsonBible.size(); i++) {
 
-        boolean bCompare;
-        if( ctBibleCompare != null )
-        {
-            bCompare = ctBibleCompare.isChecked();
-        }else
-        {
-            bCompare = true;
+            if (m_strIsReplace.equals("Y") && ctBibleCompare.isChecked()) {
+                String[] strData = arrayJsonBible.get(i);
+                dataNumber.add(strData[0]);
+                dataVerse.add(strData[1]);
+            }else
+            {
+                String[] strData = arrayJsonBible.get(i);
+                int nNumber = i + 1;
+                if (nNumber < 10)
+                    dataNumber.add("0" + nNumber + " ");
+                else
+                    dataNumber.add(i + 1 + " ");
+                dataVerse.add(strData[1]);
+            }
         }
 
-
-
-        String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+"Download"+File.separator;;
-
-        // 성경 비교기능을 사용 할 것인지
-        if( bCompare)
-            arrayBible =bibleReader.BibleParsing(strPath,m_strBibleVersion,m_strCompareBibleVersion,"01","01");
+        if (m_strIsReplace.equals("Y") && ctBibleCompare.isChecked())
+            mAdapter = new VerseRecyclerViewAdapter_Setting(getContext(), m_RecyclerView, true);
         else
-            arrayBible =bibleReader.BibleParsing(strPath,m_strBibleVersion, "01","01");
-
-
-        if( arrayBible == null)
-            return;
-
-        for(int i=0; i < arrayBible.size(); i++)
-        {
-            String strData[] = arrayBible.get(i);
-            dataNumber.add(strData[3]+" ");
-            dataVerse.add(strData[4]);
-        }
-
-        if( bCompare)
-            mAdapter = new VerseRecyclerViewAdapter_Setting(getContext(), m_RecyclerView,true);
-        else
-            mAdapter = new VerseRecyclerViewAdapter_Setting(getContext(), m_RecyclerView,false);
+            mAdapter = new VerseRecyclerViewAdapter_Setting(getContext(), m_RecyclerView, false);
         m_RecyclerView.setAdapter(mAdapter);
 
         mAdapter.setFontSize(Integer.parseInt(m_strFontSize) );
-
         mAdapter.setData(dataNumber,dataVerse);
-        mAdapter.setData(dataNumber, dataVerse);
+        mAdapter.notifyDataSetChanged();
 
     }
 }

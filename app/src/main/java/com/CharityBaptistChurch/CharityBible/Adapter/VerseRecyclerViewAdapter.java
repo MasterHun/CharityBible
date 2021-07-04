@@ -192,39 +192,42 @@ public class VerseRecyclerViewAdapter extends RecyclerView.Adapter<VerseRecycler
 
                     int pos = getAdapterPosition();
 
-                    if(bReplace) {
-
-                        int nNunberOne = Integer.parseInt(mdataNumber.get(pos).trim());
-                        int nNumberTwo = Integer.parseInt(mdataNumber.get(pos + 1).trim());
-
-                        if (nNunberOne == nNumberTwo) {
-
-                            mListener.onItemSelected(v, getAdapterPosition());
-                            mListener.onItemSelected(v, getAdapterPosition() + 1);
-
-                            toggleItemSelected(pos);
-                            toggleItemSelected(pos + 1);
-
-                        } else if (nNunberOne < nNumberTwo) {
-
-                            mListener.onItemSelected(v, getAdapterPosition());
-                            mListener.onItemSelected(v, getAdapterPosition() - 1);
-                            toggleItemSelected(pos);
-                            toggleItemSelected(pos - 1);
-
-                        }
-                    }else
+                    if (bReplace)
                     {
 
-                        int nNumber= Integer.parseInt(mdataNumber.get(pos).trim());
+                        if((pos < (mdataNumber.size() - 3) && pos + 1 < (mdataNumber.size() - 3))) {
+                            int nNunberOne = Integer.parseInt(mdataNumber.get(pos).trim());
+                            int nNumberTwo = Integer.parseInt(mdataNumber.get(pos + 1).trim());
 
-                        if (nNumber > 0) {
+                            if (nNunberOne == nNumberTwo) {
 
-                            mListener.onItemSelected(v, getAdapterPosition());
-                            toggleItemSelected(pos);
+                                mListener.onItemSelected(v, getAdapterPosition());
+                                mListener.onItemSelected(v, getAdapterPosition() + 1);
 
+                                toggleItemSelected(pos);
+                                toggleItemSelected(pos + 1);
+
+                            } else if (nNunberOne < nNumberTwo) {
+
+                                mListener.onItemSelected(v, getAdapterPosition());
+                                mListener.onItemSelected(v, getAdapterPosition() - 1);
+                                toggleItemSelected(pos);
+                                toggleItemSelected(pos - 1);
+
+                            }
                         }
+                    } else {
 
+                        if(pos < (mdataNumber.size() - 3)) {
+                            int nNumber = Integer.parseInt(mdataNumber.get(pos).trim());
+
+                            if (nNumber > 0) {
+
+                                mListener.onItemSelected(v, getAdapterPosition());
+                                toggleItemSelected(pos);
+
+                            }
+                        }
                     }
                 }
             });

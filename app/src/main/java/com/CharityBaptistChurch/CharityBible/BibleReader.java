@@ -35,7 +35,8 @@ public class BibleReader {
 
     // 성경버전, 성경전서, 장수
     //a_strBiblePath 은 풀패스로 넘어온다.
-    public ArrayList<String[]>  BibleParsingText(String a_strBiblePath, String a_strBibleVersion,  String a_strContentsIndex, String a_strChapter) {
+    public ArrayList<String[]>  BibleParsingText(String a_strBiblePath, String a_strBibleVersion,  String a_strContentsIndex, String a_strChapter)
+    {
         if (a_strBibleVersion == null)
             return null;
 
@@ -163,7 +164,8 @@ public class BibleReader {
     }
 
     // 성경 두개 역본 보기위한 함수
-    public ArrayList<String[]>  BibleParsingText(String a_strBiblePath, String a_strBibleVersionA, String a_strBibleVersionB, String a_strContentsIndex, String a_strChapter) {
+    public ArrayList<String[]>  BibleParsingText(String a_strBiblePath, String a_strBibleVersionA, String a_strBibleVersionB, String a_strContentsIndex, String a_strChapter)
+    {
         if (a_strBibleVersionA == null || a_strBibleVersionB == null)
             return null;
 
@@ -714,10 +716,7 @@ public class BibleReader {
 
             }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }catch (NullPointerException e)
-        {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
 
@@ -726,8 +725,50 @@ public class BibleReader {
     }
 
 
+    /*
+     * @ Func    : BibleJsonParsing()
+     * @ Param   : a_strBiblePath        성경 파일 경로
+     *             a_strBibleVersion     성경 버전정보    ex) korhkjv
+     *             a_strContensIndex     성경 장 번호     ex) 1
+     *             a_strChapter          성경
+     * @ Since   : 2021.06.29
+     * @ Last    : 2021.04.24
+     * @ Author  : mhpark
+     * @ Context : assets에 있는 성경 json파일 읽어와서 처리, 역본읽는 함수
+     */
+    public ArrayList<String[]>  BibleJsonParsing(String a_strBiblePath, String a_strBibleVersionA, String a_strBibleVersionB, String a_strContentsIndex, String a_strChapter)
+    {
+
+        if (a_strBibleVersionA == null || a_strBibleVersionB == null)
+            return null;
+
+        // 성경 종류 저장
+        m_strBibleVersionA = a_strBibleVersionA;
+        m_strBibleVersionB = a_strBibleVersionB;
+
+        String strSearchFileA = a_strBibleVersionA+a_strContentsIndex+"_"+a_strChapter+".lfb";
+        String strSearchFileB = a_strBibleVersionB+a_strContentsIndex+"_"+a_strChapter+".lfb";
+
+        String strPathA = a_strBiblePath + a_strBibleVersionA+".cbk";
+        String strPathB = a_strBiblePath + a_strBibleVersionB+".cbk";
+
+        // 1. 경로에있는 압축파일 읽어들인다.
+        File zipfileA = new File(strPathA);
+        File zipfileB = new File(strPathB);
+
+        if( !(zipfileA.isFile() && zipfileB.isFile()) )
+        {
+            Log.d("BibleParshing 1","File Not Access");
+            return null;
+        }
+
+        ArrayList<String[]> arrayList = new ArrayList<>();   // 파싱한 성경데이터 저장한 리스트
+
+       // arrayList.add(new String[]{strBibleNoB, strBibleB, strChapterB, strVerseNoB, strVerseB, strMediaFileB});
+
+
+        return null;
+    }
 
 
 }
-
-

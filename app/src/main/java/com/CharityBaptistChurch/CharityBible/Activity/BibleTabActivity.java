@@ -32,10 +32,9 @@ import com.CharityBaptistChurch.CharityBible.Util;
 public class BibleTabActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button      mTextSimpleTestament;       // 간략하게 보기 탭 버튼
-    private ListView    mListSimpleTestament;       //
-
-
     private Button      mTextListTestament;         // 리스트로 보기 탭튼 버튼
+
+    private ListView    mListSimpleTestament;
 
     private ViewFlipper mFlipper;
 
@@ -115,7 +114,6 @@ public class BibleTabActivity extends AppCompatActivity implements View.OnClickL
                             return;
                         }
 
-                    //    Toast.makeText(getApplicationContext(),btn.getText(),Toast.LENGTH_LONG).show();
                         String strBible = (String) btn.getText();
                         int nBiblePosition = findBiblePosition(strBible, "KOR_ACM");
                         final String[] bible = getResources().getStringArray(R.array.KOR);
