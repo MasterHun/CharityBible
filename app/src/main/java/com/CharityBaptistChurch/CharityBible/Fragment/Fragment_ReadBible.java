@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,6 +28,7 @@ import com.CharityBaptistChurch.CharityBible.Activity.MainActivity;
 import com.CharityBaptistChurch.CharityBible.Adapter.BibleDBAdapter;
 import com.CharityBaptistChurch.CharityBible.Adapter.VerseRecyclerViewAdapter;
 import com.CharityBaptistChurch.CharityBible.BibleReader;
+import com.CharityBaptistChurch.CharityBible.DBQueryData;
 import com.CharityBaptistChurch.CharityBible.JsonBible;
 import com.CharityBaptistChurch.CharityBible.R;
 import com.CharityBaptistChurch.CharityBible.Util;
@@ -48,26 +50,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
     public RecyclerView m_RecyclerView;
 
-    private String sBibleVersion;
-    private String sContexts;
-    private String sChapter;
-    private String m_strReplaceBibleVersion;
-    private String m_strIsReplace;
-    private String m_strFontSize;
-    private String m_strIsBlackMode;
-    private String m_strIsSleepMode;
-
     private ArrayList<Integer> arrayClickVerse;
-
-    public String getBibleVersion() {
-        return sBibleVersion;
-    }
-
-    public String getContexts() {
-        return sContexts;
-    }
-
-    public String getChapter() { return sChapter; }
 
     BibleDBAdapter dbAdapter;
 
@@ -76,9 +59,6 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
     public Fragment_ReadBible()
     {
-        sBibleVersion = "korHKJV";    // 어떤 종류의 성경인지    ex)
-        sContexts = "창세기";          // 어떤 권인지            ex) 창세기, 요한복음
-        sChapter = "01";              // 성경 몇번째 장인지      ex) 10장이면 10, 3장이면 03
     }
 
     @Override
@@ -99,8 +79,8 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
         // 성경이 존재하는지에 대한 체크
         if(isBibleChecker()) {
-            if (!(sContexts.equals("") && sChapter.equals(""))) {
-                init(sContexts, sChapter);
+            if (!(DBQueryData.getInstance().getContents().equals("") && DBQueryData.getInstance().getChapter().equals(""))) {
+                init(DBQueryData.getInstance().getContents(), DBQueryData.getInstance().getChapter());
             }
         }
         else
@@ -112,6 +92,9 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //return super.onCreateView(inflater, container, savedInstanceState);
+
+        dbAdapter = BibleDBAdapter.getInstance(getContext());
+
 
         arrayClickVerse = new ArrayList<>();
 
@@ -127,24 +110,6 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         // 최근 읽은 성경 DB조회
         getBibleData();
 
-        String strChapter;
-        String strContents;
-
-        if(getActivity() != null) {
-            strChapter = ((MainActivity) getActivity()).getBtnChapter();
-            strContents = ((MainActivity) getActivity()).getBtnContents();
-
-            if ( !(strChapter.equals("") || strContents.equals("")) ) {
-                int nIndex = strChapter.indexOf("장");
-
-                sChapter = strChapter.substring(0, nIndex);
-                sContexts = strContents;
-            }
-
-        }
-
-
-
         return m_view;
     }
 
@@ -157,84 +122,16 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
      */
     private void getBibleData()
     {
-        if(dbAdapter == null) {
-            dbAdapter = new BibleDBAdapter(getContext());
-            dbAdapter.open();
-        }
+        Log.d("Fragment_ReadBible","getBibleData()");
+
         ArrayList<String> array = dbAdapter.SelectSettingDB();
 
-        String strData = array.get(0);
-
-        String strResult;
-        int nStart = 0;
-        int nEnd = strData.indexOf('|');
-
-        int i = 0;
-
-        /// 성경이 변경됨을 감지
-        boolean bBibleChange = false;
-        boolean bBibleReplaceChange = false;
-
-        while (nEnd != -1) {
-
-            if( strData.length() < nEnd)
-                break;
-
-            strResult = strData.substring(nStart, nEnd);
-
-            switch (i)
-            {
-                case 0:
-                    sContexts = strResult;
-                    break;
-                case 1:
-                    sChapter= strResult;
-                    break;
-                case 2:
-                    m_strIsReplace = strResult;
-                    break;
-                case 3:
-                    if( sBibleVersion != null &&(!sBibleVersion.isEmpty()&&!strResult.isEmpty()) && !sBibleVersion.equalsIgnoreCase(strResult))
-                        bBibleChange = true;
-                    sBibleVersion = strResult;
-                    break;
-                case 4:
-                    if( m_strReplaceBibleVersion != null && (!m_strReplaceBibleVersion.isEmpty()&&!strResult.isEmpty()) && !m_strReplaceBibleVersion.equalsIgnoreCase(strResult))
-                        bBibleReplaceChange = true;
-                    m_strReplaceBibleVersion = strResult;
-                    break;
-                case 5:
-                    m_strFontSize = strResult;
-                    break;
-                case 6:
-                    m_strIsBlackMode = strResult;
-                    break;
-                case 7:
-                    m_strIsSleepMode = strResult;
-                    break;
-            }
-
-            // 다음 시작포인트 위치 저장
-            nStart = nEnd + 1;
-
-            nEnd = strData.indexOf('|',nEnd + 1);
-
-
-            i++;
-        }
-
-
-        JsonBibleUpdate(bBibleChange, bBibleReplaceChange);
-
-        String strLog = sContexts+","+sChapter+","+m_strIsReplace+","+sBibleVersion+","+m_strReplaceBibleVersion+","+m_strFontSize
-                +","+m_strIsBlackMode+","+m_strIsSleepMode;
-        Log.d("Fragment_ReadBible","getBibleData() >> Result:"+strLog);
+        DBQueryData.getInstance().initData(array.get(0));
+        JsonBibleUpdate();
 
         if(getActivity() != null) {
-            ((MainActivity) getActivity()).setChapter(sChapter);
-            ((MainActivity) getActivity()).setContents(sContexts);
-            ((MainActivity) getActivity()).setBtnChapter(sChapter);
-            ((MainActivity) getActivity()).setBtnContents(sContexts);
+            ((MainActivity) getActivity()).setBtnChapter(DBQueryData.getInstance().getChapter());
+            ((MainActivity) getActivity()).setBtnContents(DBQueryData.getInstance().getContents());
         }
 
     }
@@ -314,10 +211,10 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
             ArrayList<String[]> arrayBible;     // 읽어온 성경 데이터를 담을 ArrayList
 
             // 4. 성경 비교기능을 사용 할 것인지
-            if (m_strIsReplace.equals("Y"))
-                arrayBible = bibleReader.BibleParsing(strBiblesPath, sBibleVersion, m_strReplaceBibleVersion, strContentsIndex, strChapter);
+            if (DBQueryData.getInstance().getIsReplace().equals("Y"))
+                arrayBible = bibleReader.BibleParsing(strBiblesPath, DBQueryData.getInstance().getBibleVersion(), DBQueryData.getInstance().getBibleVersionReplace(), strContentsIndex, strChapter);
             else
-                arrayBible = bibleReader.BibleParsing(strBiblesPath, sBibleVersion, strContentsIndex, strChapter);
+                arrayBible = bibleReader.BibleParsing(strBiblesPath, DBQueryData.getInstance().getBibleVersion(), strContentsIndex, strChapter);
 
             if (arrayBible == null) {
                 Log.d("Fragment_ReadBible", "init() >> BibleParsing Failed");
@@ -343,23 +240,18 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
             dataNumber.add("");
 
             final VerseRecyclerViewAdapter mAdapter;
-            if (m_strIsReplace.equals("Y"))
+            if ( DBQueryData.getInstance().getIsReplace().equals("Y"))
                 mAdapter = new VerseRecyclerViewAdapter(getContext(), m_RecyclerView, this, this, true);
             else
                 mAdapter = new VerseRecyclerViewAdapter(getContext(), m_RecyclerView, this, this, false);
             m_RecyclerView.setAdapter(mAdapter);
 
-            mAdapter.setFontSize(Integer.parseInt(m_strFontSize));
+            mAdapter.setFontSize(Integer.parseInt(DBQueryData.getInstance().getFontSize()));
 
             mAdapter.setData(dataNumber, dataVerse);
 
             mAdapter.notifyDataSetChanged();
 
-
-            if (dbAdapter == null) {
-                dbAdapter = new BibleDBAdapter(getContext());
-                dbAdapter.open();
-            }
 
             // 변경된 데이터 디비 업데이트
             dbAdapter.UpdateSettingChapter(strChapter);
@@ -368,6 +260,11 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         }else{
 
             /// Json 방식으로 변경한 이유는 서버 없이 사용하기위해서 변경함
+
+            // 변경된 데이터 디비 업데이트
+            dbAdapter.UpdateSettingChapter(strChapter);
+            dbAdapter.UpdateSettingContents(strContents);
+            getBibleData();
 
             /// 성경 권에 대한 인덱스 얻어오기.
             String[] strBibleContents = getResources().getStringArray(R.array.KOR);
@@ -384,7 +281,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
             ArrayList<String[]> arrayJsonBible = new ArrayList();
             try {
-                if(m_strIsReplace.equals("Y")) {
+                if(DBQueryData.getInstance().getIsReplace().equals("Y")) {
 
                     String line = JsonBible.getInstance().getBibleJsonData();
 
@@ -455,7 +352,7 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
 
             for (int i = 0; i < arrayJsonBible.size(); i++) {
 
-                if (m_strIsReplace.equals("Y")) {
+                if (DBQueryData.getInstance().getIsReplace().equals("Y")) {
                     String[] strData = arrayJsonBible.get(i);
                     dataNumber.add(strData[0]);
                     dataVerse.add(strData[1]);
@@ -480,25 +377,17 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
             dataNumber.add(" ");
 
             final VerseRecyclerViewAdapter mAdapter;
-            if (m_strIsReplace.equals("Y"))
+            if (DBQueryData.getInstance().getIsReplace().equals("Y"))
                 mAdapter = new VerseRecyclerViewAdapter(getContext(), m_RecyclerView, this, this, true);
             else
                 mAdapter = new VerseRecyclerViewAdapter(getContext(), m_RecyclerView, this, this, false);
             m_RecyclerView.setAdapter(mAdapter);
 
-            mAdapter.setFontSize(Integer.parseInt(m_strFontSize));
+            mAdapter.setFontSize(Integer.parseInt(DBQueryData.getInstance().getFontSize()));
             mAdapter.setData(dataNumber, dataVerse);
             mAdapter.notifyDataSetChanged();
 
-            if (dbAdapter == null) {
-                dbAdapter = new BibleDBAdapter(getContext());
-                dbAdapter.open();
-            }
 
-            // 변경된 데이터 디비 업데이트
-            dbAdapter.UpdateSettingChapter(strChapter);
-            dbAdapter.UpdateSettingContents(strContents);
-            getBibleData();
         }
 
     }
@@ -511,72 +400,113 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
     @Override
     public void onItemLongSelected(View v, int position) {
 
-        String sData="";
+        StringBuilder sData= new StringBuilder();
 
         int nSize = arrayClickVerse.size();
         Collections.sort(arrayClickVerse); /// 오름차순 정렬
 
+
         if(nSize > 0)
         {
-            for(int i = 0; i < nSize ; i++)
-            {
-                int nPos = arrayClickVerse.get(i);
-                sData = sData + sBibleVersion + " " + sContexts + " " + sChapter;
 
-                if( m_strIsReplace.equals("Y"))
+            String[] strKor = getResources().getStringArray(R.array.versions_kor_new);
+            String[] strEng = getResources().getStringArray(R.array.versions_eng_new);
+
+
+
+            if (DBQueryData.getInstance().getIsReplace().equals("Y")) {
+
+                String sBibleVersion = "";
+                String sBibleVersionReplace = "";
+                int nIndex = 0;
+                for(String strBible : strEng)
                 {
-                    VerseRecyclerViewAdapter.StdViewHolder vhReplaceOne = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos);
-                    VerseRecyclerViewAdapter.StdViewHolder vhReplaceTwo = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos+1);
+                    if(strBible.equals(DBQueryData.getInstance().getBibleVersion()))
+                    {
+                        sBibleVersion = strKor[nIndex];
+                    }
 
-                    if( vhReplaceOne != null && vhReplaceTwo != null) {
+                    if(strBible.equals(DBQueryData.getInstance().getBibleVersionReplace()))
+                    {
+                        sBibleVersionReplace = strKor[nIndex];
+
+                    }
+
+                    nIndex++;
+                }
+
+                sData.append(sBibleVersion).append("\n");
+                sData.append(sBibleVersionReplace).append("\n");
+
+                for (int i = 0; i < nSize; i = i + 2) {
+                    sData.append(DBQueryData.getInstance().getContents()).append(" ").append(DBQueryData.getInstance().getChapter());
+                    int nPos = arrayClickVerse.get(i);
+                    VerseRecyclerViewAdapter.StdViewHolder vhReplaceOne = (VerseRecyclerViewAdapter.StdViewHolder) m_RecyclerView.findViewHolderForAdapterPosition(nPos);
+                    VerseRecyclerViewAdapter.StdViewHolder vhReplaceTwo = (VerseRecyclerViewAdapter.StdViewHolder) m_RecyclerView.findViewHolderForAdapterPosition(nPos + 1);
+
+                    if (vhReplaceOne != null && vhReplaceTwo != null) {
                         int nNumberOne = Integer.parseInt(vhReplaceOne.textNumber.getText().toString().trim());
                         int nNumberTwo = Integer.parseInt(vhReplaceTwo.textNumber.getText().toString().trim());
 
                         if (nNumberOne == nNumberTwo) {
-                            sData = sData + ":" + nNumberOne + "\n";
-                            sData += vhReplaceOne.textVerse.getText().toString() + "\n" + vhReplaceTwo.textVerse.getText().toString();
+                            sData.append(":").append(nNumberOne).append("\n");
+                            sData.append(vhReplaceOne.textVerse.getText().toString()).append("\n").append(vhReplaceTwo.textVerse.getText().toString());
                         } else if (nNumberOne < nNumberTwo) {
-                            sData = sData + ":" + nNumberOne + "\n";
-                            VerseRecyclerViewAdapter.StdViewHolder vhReplaceTemp;
-                            vhReplaceTemp = (VerseRecyclerViewAdapter.StdViewHolder) m_RecyclerView.findViewHolderForAdapterPosition(nPos - 1);
+                            sData.append(":").append(nNumberOne).append("\n");
+                            VerseRecyclerViewAdapter.StdViewHolder vhReplaceTemp = (VerseRecyclerViewAdapter.StdViewHolder) m_RecyclerView.findViewHolderForAdapterPosition(nPos - 1);
 
-                            if(vhReplaceTemp != null)
-                                sData += vhReplaceTemp.textVerse.getText().toString() + "\n" + vhReplaceOne.textVerse.getText().toString();
+                            if (vhReplaceTemp != null)
+                                sData.append(vhReplaceTemp.textVerse.getText().toString()).append("\n").append(vhReplaceOne.textVerse.getText().toString());
                         }
-
-                        sData += "\n";
                     }
-                }else
+                    if (i + 1 < nSize)
+                        sData.append("\n");
+                }
+            } else {
+                String sBibleVersion = "";
+                int nIndex = 0;
+                for(String strBible : strEng)
                 {
-                    VerseRecyclerViewAdapter.StdViewHolder vhReplace = (VerseRecyclerViewAdapter.StdViewHolder)m_RecyclerView.findViewHolderForAdapterPosition(nPos);
+                    if(strBible.equals(DBQueryData.getInstance().getBibleVersion()))
+                    {
+                        sBibleVersion = strKor[nIndex];
+                        break;
+                    }
 
-                    if( vhReplace != null) {
+                    nIndex++;
+                }
+                sData.append(sBibleVersion).append("\n");
+
+                for (int i = 0; i < nSize; i++) {
+                    sData.append(DBQueryData.getInstance().getContents()).append(" ").append(DBQueryData.getInstance().getChapter());
+                    int nPos = arrayClickVerse.get(i);
+                    VerseRecyclerViewAdapter.StdViewHolder vhReplace = (VerseRecyclerViewAdapter.StdViewHolder) m_RecyclerView.findViewHolderForAdapterPosition(nPos);
+
+                    if (vhReplace != null) {
                         int nNumberOne = Integer.parseInt(vhReplace.textNumber.getText().toString().trim());
 
                         if (nNumberOne > 0) {
-                            sData = sData + ":" + nNumberOne + "\n";
-                            sData += vhReplace.textVerse.getText().toString();
+                            sData.append(":").append(nNumberOne).append("\n");
+                            sData.append(vhReplace.textVerse.getText().toString());
                         }
-
-                        sData += "\n";
                     }
-
+                    if (i + 1 < nSize)
+                        sData.append("\n");
                 }
 
-
-                i++;
             }
+
         }
 
         Intent msg = new Intent(Intent.ACTION_SEND);
 
         msg.addCategory(Intent.CATEGORY_DEFAULT);
 
-        msg.putExtra(Intent.EXTRA_SUBJECT, "주제");
+        msg.putExtra(Intent.EXTRA_SUBJECT, "");
 
-        msg.putExtra(Intent.EXTRA_TEXT, sData);
+        msg.putExtra(Intent.EXTRA_TEXT, sData.toString());
 
-        msg.putExtra(Intent.EXTRA_TITLE, "제목");
+        msg.putExtra(Intent.EXTRA_TITLE, "");
 
         msg.setType("text/plain");
 
@@ -679,40 +609,35 @@ public class Fragment_ReadBible extends Fragment implements VerseRecyclerViewAda
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            System.out.println("INSIDEEEEEE");
             // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
                     activity,
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );
-        } else {
-            System.out.println("HEREEEEEEEEE");
         }
     }
 
-    private void JsonBibleUpdate(Boolean bBibleChange, Boolean bBibleReplaceChange){
+    public void JsonBibleUpdate(){
 
         AssetManager am = getResources().getAssets();
         InputStream inputStream = null;
         InputStream inputStreamReplace = null;
         try {
-
-            if (bBibleReplaceChange || JsonBible.getInstance().getBibleJsonData().isEmpty()) {
-                inputStream = am.open(sBibleVersion + ".json");
+                inputStream = am.open(DBQueryData.getInstance().getBibleVersion() + ".json");
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader reader = new BufferedReader(inputStreamReader);
                 String line = reader.readLine();
                 JsonBible.getInstance().setBibleJsonData(line);
-            }
 
-            if (bBibleChange || JsonBible.getInstance().getBibleJsonDataReplace().isEmpty()) {
-                inputStreamReplace = am.open(m_strReplaceBibleVersion + ".json");
+
+
+                inputStreamReplace = am.open(DBQueryData.getInstance().getBibleVersionReplace() + ".json");
                 InputStreamReader inputStreamReaderReplace = new InputStreamReader(inputStreamReplace);
                 BufferedReader readerReplace = new BufferedReader(inputStreamReaderReplace);
                 String lineReplace = readerReplace.readLine();
                 JsonBible.getInstance().setBibleJsonDataReplace(lineReplace);
-            }
+
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.net.IpSecManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -35,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.CharityBaptistChurch.CharityBible.Adapter.BibleDBAdapter;
+import com.CharityBaptistChurch.CharityBible.DBQueryData;
 import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_ReadBible;
 import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_Search;
 import com.CharityBaptistChurch.CharityBible.Fragment.Fragment_Setting;
@@ -79,23 +81,14 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
     Fragment_ReadBible m_fragmentReadBible;
 
-    private ArrayList<String> arrayBibleList;
+    private ArrayList<String> arrayBibleListKor;
+    private ArrayList<String> arrayBibleListEng;
 
-    private String m_strBibleVersion;           //
-    private String m_strContexts;
-    private String m_strChapter;
-    private String m_strCompareBibleVersion;
-    private String m_strIsReplace;
-    private String m_strFontSize;
-    private String m_strIsBlackMode;
-    private String m_strIsSleepMode;
+    //private String m_strChapter;
 
     public BibleDBAdapter dbAdapter;
 
-    // *변수선언
-    private String m_strContents = "창세기";         // 현재 성경 전서
-   // private String m_strChapter = "1";             // 현재 성경 장
-    private String m_strLang = "KOR";              // 현재 성경 언어
+    //private String m_strContents = "창세기";         // 현재 성경 전서
     private int m_nNowMaxChapter = 0;              // 현재 성경전서의 최대장수
     private int m_nNowIndexContents = 0;           // 현재 성경 전서의 인덱스번호
     static int m_nSelectItem = -1;
@@ -107,6 +100,11 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     MusicPlayer m_mp;
 
 
+
+    private BibleDBAdapter dbFunc(){
+        return BibleDBAdapter.getInstance(getApplicationContext());
+    }
+
     /*
      * @ Func    : onCreate()
      * @ Param   : ~~~
@@ -117,6 +115,19 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+        if(dbFunc().GetTableCount(BibleDBAdapter.DATABASE_TABLE_SETTING) == 0) {
+            dbFunc().InsertSetting_DB("창세기", "01", "Y", "korHKJV",
+                    "engNKJV", "15", "Y", "Y");
+        }
+//        dbAdapter = new BibleDBAdapter(getApplicationContext());
+//        dbAdapter = BibleDBAdapter.getInstance(getApplicationContext());
+//        if(dbAdapter.GetTableCount(BibleDBAdapter.DATABASE_TABLE_SETTING) == 0) {
+//            dbAdapter.InsertSetting_DB("창세기", "01", "Y", "korHKJV",
+//                    "engNKJV", "15", "Y", "Y");
+//        }
+
         // *로딩이미지 호출
         if(!m_bLoadingImg) {
             Intent intent = new Intent(this, LoadingActivity.class);
@@ -135,12 +146,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         // *권한 체크하기
         checkVerify();
 
-        // *보유중인 성경 가져오
-        arrayBibleList = getBibleList();
-
-
-        // *다운로드 체크
-        //DownLoadChecker();
+        getBibleList();
 
         ImageButton iBtn_NextSound = findViewById(R.id.IB_next);        // 다음 음성파일 재생 변수선언
         iBtn_NextSound.setOnClickListener(this);
@@ -277,12 +283,12 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         m_Btn_Chapter.setOnClickListener(this);
 
         // *성경종류
-        m_Btn_SelectBible = findViewById(R.id.BTN_selectbible);
-        m_Btn_SelectBible.setOnClickListener(this);
+//        m_Btn_SelectBible = findViewById(R.id.BTN_selectbible);
+//        m_Btn_SelectBible.setOnClickListener(this);
 
         // *음성파일 재생
-        m_ImgBtn_Sound = findViewById(R.id.IB_sound);
-        m_ImgBtn_Sound.setOnClickListener(this);
+      //  m_ImgBtn_Sound = findViewById(R.id.IB_sound);
+      //  m_ImgBtn_Sound.setOnClickListener(this);
 
         // *미니플레이어를 숨김
         m_Linear_Miniplayer = findViewById(R.id.lineaMiniplayer);
@@ -325,18 +331,12 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             }
         });
 
-
-
-        dbAdapter = new BibleDBAdapter(this);
-        dbAdapter.open();
-
-        ArrayList<String> array = dbAdapter.SelectSettingDB();
-        if( 0 == array.size())
-        {
-            dbAdapter.InsertSetting_DB("창세기", "01", "Y", "korHKJV",
-                    "engnkjv", "15", "Y", "Y");
-            dbAdapter.InsertUnderline_DB("창세기", "01", "20");
-        }
+//        if( 0 == dbAdapter.SelectSettingDB().size())
+//        {
+//            dbAdapter.InsertSetting_DB("창세기", "01", "Y", "korHKJV",
+//                    "engNKJV", "15", "Y", "Y");
+//         //   dbAdapter.InsertUnderline_DB("창세기", "01", "20");
+//        }
 
         init();
 
@@ -355,6 +355,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
         if(dbAdapter != null)
             dbAdapter.UpdateSettingContents(a_strContents);
+
 
     }
 
@@ -383,13 +384,13 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         return "";
     }
 
-    public void setContents(String m_strContents) {
-        this.m_strContents = m_strContents;
-    }
+//    public void setContents(String m_strContents) {
+//        this.m_strContents = m_strContents;
+//    }
 
-    public void setChapter(String m_strChapter) {
-        this.m_strChapter = m_strChapter;
-    }
+//    public void setChapter(String m_strChapter) {
+//        this.m_strChapter = m_strChapter;
+//    }
 
     SNavigationDrawer sNavigationDrawer;
     Class fragmentClass;
@@ -476,10 +477,10 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
         String strChapter;
         String strContents;
         int nChapter = 0;
+        String sChapter = "";
 
         Intent intent = getIntent();
         if( intent.getExtras() != null ) {
-            Log.d("MainActivity","OnResume() >> intent 값받아옴");
             strChapter = intent.getStringExtra("Chapter");      // 성경 장
             strContents = intent.getStringExtra("Contents");     // 성경 전서
             Log.d("MainActivity","OnResume() >> "+strContents+":"+strChapter);
@@ -490,20 +491,22 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
             if( nChapter > 0)
             {
-                m_strChapter = strChapter;
+                DBQueryData.getInstance().setChapter(strChapter);
+                sChapter = DBQueryData.getInstance().getChapter();
                 Toast.makeText(getApplicationContext(), strContents,Toast.LENGTH_SHORT).show();
             }
 
             if(strContents != null)
             {
-                m_strContents = strContents;
+                DBQueryData.getInstance().setContents(strContents);
             }
 
+            String sContents = DBQueryData.getInstance().getContents();
             m_fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
             assert m_fragmentReadBible != null;
-            m_fragmentReadBible.init(m_strContents,m_strChapter);
-            setBtnContents(m_strContents);
-            setBtnChapter(m_strChapter);
+            m_fragmentReadBible.init(sContents,sChapter);
+            setBtnContents(sContents);
+            setBtnChapter(sChapter);
             init();
 
 
@@ -525,17 +528,13 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     private void init()
     {
 
-
-        // 다운로드된 파일이 있는지 체크
-     //   DownloadChecker();
-
         String[] strBibleContents = getResources().getStringArray(R.array.KOR);
         String[] strBibleMaxLen = getResources().getStringArray(R.array.KOR_LEN);
 
         for(int i = 0; i < strBibleContents.length; i ++) {
 
             // 현재 성경전서과 같은 인데스 위치 찾음
-            if(strBibleContents[i].equals(m_strContents)) {
+            if(strBibleContents[i].equals(DBQueryData.getInstance().getContents())) {
                 m_nNowIndexContents = i;
                 m_nNowMaxChapter = Integer.parseInt(strBibleMaxLen[i]);
                 break;
@@ -564,31 +563,38 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
     public void onClick(View v) {
 
         m_fragmentReadBible = (Fragment_ReadBible) getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        int nChapter = Integer.parseInt(m_strChapter);
+        int nChapter = Integer.parseInt(DBQueryData.getInstance().getChapter());
         switch (v.getId())
         {
 
             case R.id.FAT_Previous:  // *이전 장
+
                 if(nChapter > 1) {
-                    m_strChapter = Integer.toString(nChapter - 1);
-                    m_fragmentReadBible.init(m_strContents, m_strChapter);
+                    String sChapter = Integer.toString(nChapter - 1);
+                    String sContext = DBQueryData.getInstance().getContents();
+                    m_fragmentReadBible.init(sContext, sChapter);
                     init();
-                    setBtnContents(m_strContents);
-                    setBtnChapter(m_strChapter);
+                    setBtnContents(sContext);
+                    setBtnChapter(sChapter);
                 }else
                 {
                     if (m_nNowIndexContents > 0) {
-                        m_nNowIndexContents--;
+                        m_nNowIndexContents = m_nNowIndexContents - 1;
                         String[] strBibleContents = getResources().getStringArray(R.array.KOR);
 
                         // 이전 성경전서로 이동
-                        m_strContents = strBibleContents[m_nNowIndexContents];
-                        init();
-                        m_strChapter = Integer.toString(m_nNowMaxChapter);
-                        m_fragmentReadBible.init(m_strContents, m_strChapter);
+                        DBQueryData.getInstance().setContents(strBibleContents[m_nNowIndexContents]);
+                        String sContents = DBQueryData.getInstance().getContents();
 
-                        setBtnContents(m_strContents);
-                        setBtnChapter(m_strChapter);
+                        init();
+
+                        DBQueryData.getInstance().setChapter(Integer.toString(m_nNowMaxChapter));
+                        String sChapter = DBQueryData.getInstance().getChapter();
+
+                        m_fragmentReadBible.init(sContents, sChapter);
+
+                        setBtnContents(sContents);
+                        setBtnChapter(sChapter);
                     }else
                     {
                         Toast.makeText(getApplicationContext(),"첫 장입니다.",Toast.LENGTH_SHORT).show();
@@ -599,12 +605,14 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             case R.id.FAT_Next:  // *다음 장
 
                 if(nChapter < m_nNowMaxChapter) {
-                    m_strChapter = Integer.toString(nChapter + 1);
-                    m_fragmentReadBible.init(m_strContents, m_strChapter);
+                    DBQueryData.getInstance().setChapter(Integer.toString(nChapter + 1));
 
+                    String sChapter = DBQueryData.getInstance().getChapter();
+                    String sContents = DBQueryData.getInstance().getContents();
+                    m_fragmentReadBible.init(sContents, sChapter);
                     init();
-                    setBtnContents(m_strContents);
-                    setBtnChapter(m_strChapter);
+                    setBtnContents(sContents);
+                    setBtnChapter(sChapter);
 
                 }else
                 {
@@ -612,13 +620,18 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     if( m_nNowIndexContents < 65) {
                         m_nNowIndexContents++;
                         String[] strBibleContents = getResources().getStringArray(R.array.KOR);
-                        m_strContents = strBibleContents[m_nNowIndexContents];
-                        m_strChapter = "1";
 
-                        m_fragmentReadBible.init(m_strContents, m_strChapter);
+                        DBQueryData.getInstance().setContents(strBibleContents[m_nNowIndexContents]);
+                        String sContents = DBQueryData.getInstance().getContents();
+
+                        DBQueryData.getInstance().setChapter("1");
+
+                        String sChapter = DBQueryData.getInstance().getChapter();
+
+                        m_fragmentReadBible.init(sContents, sChapter);
                         init();
-                        setBtnContents(m_strContents);
-                        setBtnChapter(m_strChapter);
+                        setBtnContents(sContents);
+                        setBtnChapter(sChapter);
                     }else
                     {
                         Toast.makeText(getApplicationContext(),"마지막 장 입니다..",Toast.LENGTH_SHORT).show();
@@ -628,127 +641,101 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
 
 
                 break;
-            case R.id.BTN_contents: // *성경 전서
+            case R.id.BTN_contents: // *성경 전서택 선택
 
-                Intent it_1 = new Intent(getApplicationContext(), BibleTabActivity.class);
-                startActivity(it_1);
+                Intent intent1 = new Intent(getApplicationContext(), BibleTabActivity.class);
+                startActivity(intent1);
                // init();
 
 
                 //setFrag(3);
                 break;
-            case R.id.BTN_chapter:  // *성경 장
+            case R.id.BTN_chapter:  // *성경 장 선
 
-                Intent it_2 = new Intent(getApplicationContext(), ChapterTableActivity.class);
-                String strBible;
-                int nBiblePosition = findBiblePosition(m_strContents, "KOR");
+                Intent intent2 = new Intent(getApplicationContext(), ChapterTableActivity.class);
+                int nBiblePosition = findBiblePosition(DBQueryData.getInstance().getContents(), "KOR");
                 final String[] bible = getResources().getStringArray(R.array.KOR);
-                strBible = bible[nBiblePosition];
+                String strBible = bible[nBiblePosition];
                 nBiblePosition =  Util.numOfChapters[nBiblePosition];
 
-                it_2.putExtra("bookPosition", nBiblePosition);
-                it_2.putExtra("bookName", strBible);
-                startActivity(it_2);
+                intent2.putExtra("bookPosition", nBiblePosition);
+                intent2.putExtra("bookName", strBible);
+                startActivity(intent2);
              //   init();
 
                 //setFrag(4);
                 break;
 
-            case R.id.BTN_selectbible:
+//            case R.id.BTN_selectbible:
+//
+//                /// 성경읽는 프래그먼트에서 성경 선택할 수 있도록 하는 버튼
+//                /// --> 킹제임스 힌글(korHKJV)
+//
+//                final CharSequence[] oItemsEng = arrayBibleListEng.toArray(new CharSequence[arrayBibleListEng.size()]);
+//                final CharSequence[] oItemsKor = arrayBibleListKor.toArray(new CharSequence[arrayBibleListKor.size()]);
+//
+//                AlertDialog.Builder oDialog = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
+//
+//                oDialog.setTitle("읽을 성경을 선택해주세요").setSingleChoiceItems(oItemsKor, m_nSelectItem, new DialogInterface.OnClickListener() {
+//
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        m_nSelectItem = which;
+//                    }
+//                }).setNeutralButton("선택", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//
+//                        if (m_nSelectItem >= 0) {
+//                            m_Btn_SelectBible.setText(oItemsKor[m_nSelectItem]);
+//                            m_fragmentReadBible.init(DBQueryData.getInstance().getContents(), DBQueryData.getInstance().getChapter());
+//                        }
+//
+//
+//                    }
+//                }).setCancelable(false).show();
+//
+//                break;
 
-                //versions_eng_new
-
-
-
-                List<String> listBibleKor = new ArrayList<String>();
-                List<String> listBibleEng = new ArrayList<String>();
-
-                final String[] sEngBibleList = getResources().getStringArray(R.array.versions_eng_new);
-                final String[] sKorBibleList = getResources().getStringArray(R.array.versions_kor_new);
-                for(int i = 0; arrayBibleList.size() > i; i++)
-                {
-                    String sBibleName = arrayBibleList.get(i);
-                    if(sBibleName.contains(".cbk"))
-                    {
-                        int nBibleNameLength = sBibleName.length();
-                        String sBible = sBibleName.substring(0, nBibleNameLength-4);
-
-                        for(int j = 0; sEngBibleList.length > j; j++)
-                        {
-                            if( sEngBibleList[j].equalsIgnoreCase(sBible))
-                            {
-                                listBibleEng.add(sEngBibleList[j]);
-                                listBibleKor.add(sKorBibleList[j]);
-                                break;
-                            }
-
-                        }
-
-                    }
-
-                }
-
-                final CharSequence[] oItemsEng = listBibleEng.toArray(new CharSequence[listBibleEng.size()]);
-                final CharSequence[] oItemsKor = listBibleKor.toArray(new CharSequence[listBibleKor.size()]);
-
-                AlertDialog.Builder oDialog = new AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
-
-
-                oDialog.setTitle("읽을 성경을 선택해주세요").setSingleChoiceItems(oItemsKor, m_nSelectItem, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        m_nSelectItem = which;
-                    }
-                }).setNeutralButton("선택", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        if(m_nSelectItem > 0)
-                            m_Btn_SelectBible.setText(oItemsEng[m_nSelectItem]);
-                    }
-                }).setCancelable(false).show();
-
-                break;
-
-            case R.id.IB_sound:
-
-                Toast.makeText(this, "해당기능은 준비중입니다.",Toast.LENGTH_SHORT).show();
-                if(false) {
-                    if (m_bSound) {    // 사운드 버튼 Off
-
-                        m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
-                        m_bSound = false;
-
-                        m_ImgBtn_Sound.setSelected(false);
-
-                        m_FABtn_NextChapter.animate().translationY(0).start();
-                        m_FABtn_PreviousChapter.animate().translationY(0).start();
-
-                        if (m_mp != null) {
-                            m_mp.clearMediaPlayer();
-                            m_mp = null;
-                        }
-                    } else {          // 사운드 버튼 On
-                        m_Linear_Miniplayer.setVisibility(View.VISIBLE);
-                        m_bSound = true;
-
-                        m_ImgBtn_Sound.setSelected(true);
-
-                        m_FABtn_NextChapter.animate().translationY(-180).start();
-                        m_FABtn_PreviousChapter.animate().translationY(-180).start();
-
-                        String strSoundPath = Environment.getExternalStorageDirectory() + File.separator + Util.m_strDirectory + File.separator + "BibleSound";
-                        if (m_mp == null) {
-                            m_mp = new MusicPlayer(strSoundPath);
-                            m_mp.initMusic(
-                                    m_fragmentReadBible.getBibleVersion(),
-                                    m_fragmentReadBible.getContexts(),
-                                    Integer.parseInt(m_fragmentReadBible.getChapter()));
-                        }
-                    }
-                }
-                break;
+//            case R.id.IB_sound:
+//
+//                Toast.makeText(this, "해당기능은 준비중입니다.",Toast.LENGTH_SHORT).show();
+//                if(false) {
+//                    if (m_bSound) {    // 사운드 버튼 Off
+//
+//                        m_Linear_Miniplayer.setVisibility(View.INVISIBLE);
+//                        m_bSound = false;
+//
+//                        m_ImgBtn_Sound.setSelected(false);
+//
+//                        m_FABtn_NextChapter.animate().translationY(0).start();
+//                        m_FABtn_PreviousChapter.animate().translationY(0).start();
+//
+//                        if (m_mp != null) {
+//                            m_mp.clearMediaPlayer();
+//                            m_mp = null;
+//                        }
+//                    } else {          // 사운드 버튼 On
+//                        m_Linear_Miniplayer.setVisibility(View.VISIBLE);
+//                        m_bSound = true;
+//
+//                        m_ImgBtn_Sound.setSelected(true);
+//
+//                        m_FABtn_NextChapter.animate().translationY(-180).start();
+//                        m_FABtn_PreviousChapter.animate().translationY(-180).start();
+//
+//                        String strSoundPath = Environment.getExternalStorageDirectory() + File.separator + Util.m_strDirectory + File.separator + "BibleSound";
+//                        if (m_mp == null) {
+//                            m_mp = new MusicPlayer(strSoundPath);
+//                            m_mp.initMusic(
+//                                    DBQueryData.getInstance().getBibleVersion(),
+//                                    DBQueryData.getInstance().getContents(),
+//                                    Integer.parseInt(DBQueryData.getInstance().getChapter()));
+//                        }
+//                    }
+//                }
+//                break;
             case R.id.IB_next:
                 if(m_mp != null)
                 {
@@ -863,59 +850,32 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
      * @ Author  : mhpark
      * @ Context : 성경 경로에있는 성경 리스트 얻어오기
      */
-    public ArrayList<String> getBibleList() {
+    public void getBibleList() {
 
-        ArrayList<String> arrayList = new ArrayList<>();
 
-        //String strPath = getFilesDir().getAbsolutePath() + File.separator + "Bibles" + File.separator;
-        String strPath = Environment.getExternalStorageDirectory().getAbsolutePath()+File.separator+Util.m_strDirectory+File.separator;
-        Log.d("MainActivity ", "getBibleList() >> Path[" + strPath + "]");
-        File file = new File(strPath);
-        File[] filelist = file.listFiles();
+        if( arrayBibleListKor == null && arrayBibleListEng == null) {
+            arrayBibleListEng = new ArrayList<>();
+            arrayBibleListKor = new ArrayList<>();
 
-        assert filelist != null;
-        for(int i = 0; i < filelist.length; i++)
-        {
-            if( filelist[i].getName().indexOf(".cbk") > 0 )
-            {
+            String []strKor = getResources().getStringArray(R.array.versions_kor_new);
+            String []strEng = getResources().getStringArray(R.array.versions_eng_new);
+            AssetManager am = getResources().getAssets();
+            InputStream inputStream;
 
-                arrayList.add(filelist[i].getName());
+            for (int i = 0; i<strEng.length; i++) {
+                try {
+                    inputStream = am.open(strEng[i] + ".json");
 
-//                try {
-//
-//                    String strName = filelist[i].getName();
-//                    int nIndex = strName.indexOf('.');
-//                    strName = strName.substring(0,nIndex);
-//
-//
-//                    ZipFile zip = new ZipFile(filelist[i].getAbsoluteFile(), ZipFile.OPEN_READ);
-//
-//                    int nSize = zip.size();
-//
-//                    String strFile = strName+"01_01"+".lfb";
-//                    ZipEntry entry = zip.getEntry(strFile);
-//                    InputStream inputStream = zip.getInputStream(entry);
-//
-//                    Scanner sc = new Scanner(inputStream);
-//                    while(sc.hasNext())
-//                    {
-//                        arrayList.add(sc.nextLine());
-//                    }
-//
-//
-//
-//                    zip.close();
-//
-//                } catch (IOException e)
-//                {
-//                    e.printStackTrace();
-//                }
+                    arrayBibleListKor.add(strKor[i]);
+                    arrayBibleListEng.add(strEng[i]);
+                    inputStream.close();
+                }catch (Exception io )
+                {
+                    io.printStackTrace();
+                }
+
             }
-
         }
-
-        return arrayList;
-
     }
 
     // 권한관련
@@ -963,18 +923,6 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                     finish();
                 }
             }
-        }
-    }
-
-
-    private void DownLoadChecker()
-    {
-
-        if(arrayBibleList.size() == 0) {
-
-                //String url = "https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fk.kakaocdn.net%2Fdn%2Fb4LL01%2Fbtqv809t5X9%2FVY5qybXsG3TKsXbIiSD1KK%2Fimg.jpg";
-            DownloadFileAsync df = new DownloadFileAsync(this);
-            df.execute("","1","1");
         }
     }
 
@@ -1047,11 +995,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
                 // 작업이 진행되면서 호출하며 화면의 업그레이드를 담당하게 된다
                 //publishProgress("progress", 1, "Task " + 1 + " number");
 
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e){
+            } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
 
@@ -1078,6 +1022,7 @@ public class MainActivity extends AppCompatActivity implements Button.OnClickLis
             //Toast.LENGTH_SHORT).show();
         }
     }
+
 
 
 

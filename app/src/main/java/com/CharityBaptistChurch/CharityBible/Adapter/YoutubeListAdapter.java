@@ -81,7 +81,7 @@ public class YoutubeListAdapter extends BaseAdapter implements YouTubeThumbnailV
             holder.m_tvTitle = view.findViewById(R.id.tvTitle);
             holder.m_tvDate = view.findViewById(R.id.tvDate);
 
-            Log.d("mhpark","Youtube A ["+position+"]");
+            Log.d("YoutubeListAdapter","Youtube A ["+position+"]");
 
 
             view.setTag(holder);
@@ -89,14 +89,14 @@ public class YoutubeListAdapter extends BaseAdapter implements YouTubeThumbnailV
         }
         else
         {
-            Log.d("mhpark","Youtube C ["+position+"]");
+            Log.d("YoutubeListAdapter","Youtube C ["+position+"]");
             holder = (YoutubeViewHolder) view.getTag();
             YouTubeThumbnailView thumbnail = view.findViewById(R.id.item_video);
             YouTubeThumbnailLoader loader = loaders.get(thumbnail);
             if(loader == null){
                 thumbnail.setTag(videoId);
             }else{
-                 thumbnail.setImageResource(R.drawable.ic_volume_black_24dp);
+                thumbnail.setTag(videoId);
                 loader.setVideo(videoId);
             }
         }
@@ -125,7 +125,7 @@ public class YoutubeListAdapter extends BaseAdapter implements YouTubeThumbnailV
     public void onInitializationSuccess(YouTubeThumbnailView view, YouTubeThumbnailLoader loader) {
         String videoId = (String) view.getTag();
         loaders.put(view, loader);
-    //    view.setImageResource(R.drawable.ic_launcher_foreground);
+        view.setImageResource(R.drawable.ic_launcher_foreground);
         loader.setVideo(videoId);
 
     }

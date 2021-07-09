@@ -68,10 +68,10 @@ public class ChapterTableActivity extends AppCompatActivity {
                 // 사용자가 선택한 장수
                 String strBibleSelectedChapter  = ((TextView) v).getText().toString();
 
-                if( Integer.parseInt(strBibleSelectedChapter) < 9)
-                {
-                    strBibleSelectedChapter = "0" +strBibleSelectedChapter;
-                }
+//                if( Integer.parseInt(strBibleSelectedChapter) < 9)
+//                {
+//                    strBibleSelectedChapter = "0" +strBibleSelectedChapter;
+//                }
 
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

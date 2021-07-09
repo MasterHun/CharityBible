@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.CharityBaptistChurch.CharityBible.Adapter.BibleDBAdapter;
 import com.CharityBaptistChurch.CharityBible.Adapter.VerseRecyclerViewAdapter_Search;
+import com.CharityBaptistChurch.CharityBible.DBQueryData;
 import com.CharityBaptistChurch.CharityBible.R;
 import com.CharityBaptistChurch.CharityBible.Util;
 import com.gc.materialdesign.widgets.ProgressDialog;
@@ -87,8 +88,8 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
         m_txTotalCnt = m_View.findViewById(R.id.txTotalCnt);
 
 
-        dbAdapter = new BibleDBAdapter(getContext());
-        dbAdapter.open();
+        dbAdapter = BibleDBAdapter.getInstance(getContext());
+
 
         m_btnSearch.setOnClickListener(new Button.OnClickListener(){
             @Override
@@ -719,6 +720,8 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
 
         if(nSize > 0)
         {
+
+            sData.append(DBQueryData.getInstance().getBibleVersion()).append("\n");
             for(int i = 0; i < nSize ; i++)
             {
                 int nPos = arrayClickVerse.get(i);
@@ -740,12 +743,11 @@ public class Fragment_Search extends Fragment implements VerseRecyclerViewAdapte
 
         msg.addCategory(Intent.CATEGORY_DEFAULT);
 
-        msg.putExtra(Intent.EXTRA_SUBJECT, "주제");
-        //msg.putExtra(Intent.EXTRA_TEXT, "내용");
-        // Log.d("test","[hun]"+ sData);
+        msg.putExtra(Intent.EXTRA_SUBJECT, "");
+
         msg.putExtra(Intent.EXTRA_TEXT, sData.toString());
 
-        msg.putExtra(Intent.EXTRA_TITLE, "제목");
+        msg.putExtra(Intent.EXTRA_TITLE, "");
 
         msg.setType("text/plain");
 

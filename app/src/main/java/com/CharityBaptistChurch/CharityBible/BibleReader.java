@@ -14,13 +14,13 @@ import java.util.zip.ZipFile;
 
 public class BibleReader {
 
-    public static String m_strBibleVersionA = "korhkjv";     // 성경 버전
-    public static String m_strBibleVersionB = "engnkjv";        // 성경버전
+    public static String m_strBibleVersionA = "korHKJV";     // 성경 버전
+    public static String m_strBibleVersionB = "engNKJV";        // 성경버전
 
     public BibleReader()
     {
-        m_strBibleVersionA = "korhkjv";
-        m_strBibleVersionB = "engnkjv";
+        m_strBibleVersionA = "korHKJV";
+        m_strBibleVersionB = "engNKJV";
     }
 
     public BibleReader(String a_strBibleVersionA)

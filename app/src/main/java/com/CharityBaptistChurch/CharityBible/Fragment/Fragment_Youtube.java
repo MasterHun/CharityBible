@@ -246,7 +246,7 @@ public class Fragment_Youtube extends Fragment implements View.OnClickListener, 
                     if (data == null) break;
                     result += data;
                 }
-                Log.d("MainActivity", result);
+                Log.d("Fragment_youtube", result);
                 JSONObject obj = new JSONObject(result);
                 JSONArray arr = (JSONArray) obj.get("items");
 

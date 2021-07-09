@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.CharityBaptistChurch.CharityBible">
+    package="com.CharityBaptistChurch.CharityBible"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
 
     <application
-        android:allowBackup="true"
+
         android:icon="@mipmap/ic_launcher_bible"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_bible_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
+
+        android:allowBackup="false"
+        tools:replace="android:allowBackup"
 
         android:requestLegacyExternalStorage = "true"
 
